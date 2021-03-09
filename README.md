@@ -1,2 +1,3 @@
-# Java Ray Tracing Project
- Java Ray Tracing Mini Project
+# Java Ray Tracing Mini Project
+
+Jonah Lawrence & Elad Harizy
