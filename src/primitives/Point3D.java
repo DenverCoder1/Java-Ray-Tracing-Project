@@ -10,9 +10,9 @@ import java.util.Objects;
  * @author Elad Harizy
  */
 public class Point3D {
-  public final Coordinate x;
-  public final Coordinate y;
-  public final Coordinate z;
+  final Coordinate x;
+  final Coordinate y;
+  final Coordinate z;
 
   public static final Point3D ZERO = new Point3D(0, 0, 0);
 
