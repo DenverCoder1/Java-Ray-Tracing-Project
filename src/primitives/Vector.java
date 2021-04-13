@@ -18,8 +18,11 @@ public class Vector {
    * @param x The x coordinate of the head
    * @param y The y coordinate of the head
    * @param z The z coordinate of the head
+   * 
+   * @throws IllegalArgumentException if head point is ZERO
    */
   public Vector(double x, double y, double z) {
+    // call the constructor that takes a Point3D
     this(new Point3D(x, y, z));
   }
 
@@ -27,6 +30,8 @@ public class Vector {
    * Constructor that takes a Point3D
    * 
    * @param head Point3D representing the head of the vector
+   * 
+   * @throws IllegalArgumentException if head point is ZERO
    */
   public Vector(Point3D head) {
     if (head.equals(Point3D.ZERO)) {

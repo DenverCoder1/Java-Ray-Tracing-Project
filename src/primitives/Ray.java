@@ -11,8 +11,8 @@ import java.util.Objects;
  */
 public class Ray {
 
-  public final Point3D origin;
-  public final Vector direction;
+  final Point3D origin;
+  final Vector direction;
 
   /**
    * Constructor that takes the origin and direction
