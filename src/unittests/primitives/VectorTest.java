@@ -38,9 +38,14 @@ public class VectorTest {
 	public void testSubtract() {
 		// ============ Equivalence Partitions Tests ==============
 
+		// same quadrant
 		Vector v1 = new Vector(1, 2, 3);
 		Vector v2 = new Vector(4, 5, 6);
 		assertEquals(new Vector(-3.0, -3.0, -3.0), v1.subtract(v2));
+
+		// different quadrant
+		Vector v3 = new Vector(-2, -3, -4);
+		assertEquals(new Vector(3, 5, 7), v1.subtract(v3));
 
 		// =============== Boundary Values Tests ==================
 
@@ -55,13 +60,17 @@ public class VectorTest {
 	public void testAdd() {
 		// ============ Equivalence Partitions Tests ==============
 
+		// same quadrant
 		Vector v1 = new Vector(1, 2, 3);
 		Vector v2 = new Vector(4, 5, 6);
 		assertEquals(new Vector(5.0, 7.0, 9.0), v1.add(v2));
 
+		// different quadrant
+		Vector v3 = new Vector(-1, -2, -3);
+		assertEquals(new Vector(3, 3, 3), v2.add(v3));
+
 		// =============== Boundary Values Tests ==================
 
-		Vector v3 = new Vector(-1, -2, -3);
 		assertThrows("add to get zero vector does not throw an exception", IllegalArgumentException.class,
 				() -> v1.add(v3));
 	}
@@ -87,9 +96,20 @@ public class VectorTest {
 	 */
 	@Test
 	public void testDotProduct() {
+		// ============ Equivalence Partitions Tests ==============
 		Vector v1 = new Vector(1, 2, 3);
 		Vector v2 = new Vector(4, 5, 6);
-		assertTrue(isZero(v1.dotProduct(v2) - 32));
+		Vector v3 = new Vector(1, 2, 0);
+		Vector v4 = new Vector(1, -0.5, 0);
+		assertTrue("dot product failed", isZero(v1.dotProduct(v2) - 32));
+
+		// =============== Boundary Values Tests ==================
+		// same direction
+		assertTrue("same direction failed", isZero(v1.dotProduct(v1) - v1.lengthSquared()));
+		// orthogonal
+		assertTrue("orthogonal failed", isZero(v3.dotProduct(v4)));
+		// opposite
+		assertTrue("opposite failed", isZero(v3.dotProduct(v3.scale(-1)) - (-1 * v3.lengthSquared())));
 	}
 
 	/**
@@ -103,17 +123,17 @@ public class VectorTest {
 		Vector v2 = new Vector(0, 3, -2);
 		Vector vr = v1.crossProduct(v2);
 
-		// TC01: Test that length of cross-product is proper (orthogonal vectors taken
+		// Test that length of cross-product is proper (orthogonal vectors taken
 		// for simplicity)
 		assertEquals("crossProduct() wrong result length", v1.length() * v2.length(), vr.length(), 0.00001);
 
-		// TC02: Test cross-product result orthogonality to its operands
+		// Test cross-product result orthogonality to its operands
 		assertTrue("crossProduct() result is not orthogonal to 1st operand", isZero(vr.dotProduct(v1)));
 		assertTrue("crossProduct() result is not orthogonal to 2nd operand", isZero(vr.dotProduct(v2)));
 
 		// =============== Boundary Values Tests ==================
 
-		// TC11: test zero vector from cross-productof co-lined vectors
+		// Test zero vector from cross-productof co-lined vectors
 		Vector v3 = new Vector(-2, -4, -6);
 		assertThrows("crossProduct() for parallel vectors does not throw an exception", IllegalArgumentException.class,
 				() -> v1.crossProduct(v3));
