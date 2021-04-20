@@ -46,7 +46,12 @@ public class Tube implements Geometry {
 
   @Override
   public Vector getNormal(Point3D point) {
-    return null;
+    double scalar = axis.getDirection().dotProduct(point.subtract(axis.getOrigin()));
+    if (scalar == 0) {
+      return point.subtract(axis.getOrigin()).normalize();
+    }
+    Point3D p2 = axis.getOrigin().add(axis.getDirection().scale(scalar));
+    return point.subtract(p2).normalize();
   }
 
   @Override

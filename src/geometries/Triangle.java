@@ -17,12 +17,15 @@ public class Triangle extends Polygon {
    * @param first  the first point
    * @param second the second point
    * @param third  the third point
+   * 
+   * @throws IllegalArgumentException in any case Polygon does
    */
   public Triangle(Point3D first, Point3D second, Point3D third) {
     super(first, second, third);
   }
 
-  public Vector getNormal() {
-    return null;
+  @Override
+  public Vector getNormal(Point3D point) {
+    return plane.getNormal();
   }
 }

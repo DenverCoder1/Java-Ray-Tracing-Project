@@ -37,7 +37,14 @@ public class Cylinder extends Tube {
 
   @Override
   public Vector getNormal(Point3D point) {
-    return null;
+    Point3D p2 = axis.getOrigin().add(axis.getDirection().scale(height));
+    if (point.subtract(axis.getOrigin()).dotProduct(axis.getDirection()) == 0) {
+      return axis.getDirection();
+    }
+    if (point.subtract(p2).dotProduct(axis.getDirection()) == 0) {
+      return axis.getDirection().scale(-1);
+    }
+    return super.getNormal(point);
   }
 
   @Override

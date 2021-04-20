@@ -25,6 +25,24 @@ public class Ray {
     this.direction = direction.normalized();
   }
 
+  /**
+   * Get origin
+   * 
+   * @return origin
+   */
+  public Point3D getOrigin() {
+    return this.origin;
+  }
+
+  /**
+   * Get direction
+   * 
+   * @return direction
+   */
+  public Vector getDirection() {
+    return this.direction;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o == this)
