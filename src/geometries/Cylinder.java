@@ -4,6 +4,8 @@ import primitives.Point3D;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.*;
+
 /**
  * Class Cylinder is the basic class representing a cylinder of Euclidean
  * geometry in Cartesian 3-Dimensional coordinate system
@@ -38,10 +40,10 @@ public class Cylinder extends Tube {
   @Override
   public Vector getNormal(Point3D point) {
     Point3D p2 = axis.getOrigin().add(axis.getDirection().scale(height));
-    if (point.subtract(axis.getOrigin()).dotProduct(axis.getDirection()) == 0) {
+    if (isZero(point.subtract(axis.getOrigin()).dotProduct(axis.getDirection()))) {
       return axis.getDirection();
     }
-    if (point.subtract(p2).dotProduct(axis.getDirection()) == 0) {
+    if (isZero(point.subtract(p2).dotProduct(axis.getDirection()))) {
       return axis.getDirection().scale(-1);
     }
     return super.getNormal(point);
