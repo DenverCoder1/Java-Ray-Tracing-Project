@@ -47,6 +47,26 @@ public class Geometries implements Intersectable {
 
     @Override
     public List<Point3D> findIntersections(Ray ray) {
-        return null;
+        // return null if no geometries
+        if (geometryList == null) {
+            return null;
+        }
+        // initialize intersection list to null
+        List<Point3D> intersections = null;
+        Iterator<Intersectable> iterator = geometryList.iterator();
+        while (iterator.hasNext()) {
+            List<Point3D> newPoints = iterator.next().findIntersections(ray);
+            // make sure there are points
+            if (newPoints != null) {
+                // add points if list exists already
+                if (intersections != null) {
+                    intersections.addAll(newPoints);
+                    continue;
+                }
+                // otherwise, initialize with a list when first intersection found
+                intersections = newPoints;
+            }
+        }
+        return intersections;
     }
 }
