@@ -10,7 +10,7 @@ import primitives.Vector;
  * @author Jonah Lawrence
  * @author Elad Harizy
  */
-public abstract interface Geometry {
+public abstract interface Geometry extends Intersectable {
 
   /**
    * Get the normal vector of the geometry
