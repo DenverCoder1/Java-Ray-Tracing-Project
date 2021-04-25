@@ -29,4 +29,13 @@ public class CylinderTests {
         // top of the cylinder
         assertEquals("normal failed at top", new Vector(1, 0, 0), cylinder.getNormal(new Point3D(10, 0, 14)));
     }
+
+    /**
+     * Test method for
+     * {@link geometries.Cylinder#findIntersections(primitives.Ray)}.
+     */
+    @Test
+    public void testFindIntersections() {
+        // TODO: Implement
+    }
 }

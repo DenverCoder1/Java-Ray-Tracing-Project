@@ -29,4 +29,12 @@ public class TubeTests {
         // side of tube
         assertEquals("normal failed on side of tube", new Vector(1, 0, 0), tube.getNormal(new Point3D(7, 0, 0)));
     }
+
+    /**
+     * Test method for {@link geometries.Tube#findIntersections(primitives.Ray)}.
+     */
+    @Test
+    public void testFindIntersections() {
+        // TODO: Implement
+    }
 }

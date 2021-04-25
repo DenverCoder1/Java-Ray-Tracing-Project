@@ -88,17 +88,16 @@ public class PlaneTests {
         actual = plane.findIntersections(ray5);
         assertNull("orthogonal with only origin on plane should be null", actual);
 
-        // ray has below before the plane and is orthogonal to the plane
+        // ray starts before the plane and is orthogonal to the plane
         Ray ray6 = new Ray(new Point3D(0, 1, -1), new Vector(0, 0, 1));
         expected = List.of(new Point3D(0, 1, 0));
         actual = plane.findIntersections(ray6);
-        assertEquals("orthogonal below failed", expected, actual);
+        assertEquals("orthogonal before failed", expected, actual);
 
-        // ray has above before the plane and is orthogonal to the plane
-        Ray ray7 = new Ray(new Point3D(0, 1, 1), new Vector(0, 0, -1));
-        expected = List.of(new Point3D(0, 1, 0));
+        // ray starts after the plane and is orthogonal to the plane
+        Ray ray7 = new Ray(new Point3D(0, 1, 2), new Vector(0, 0, 1));
         actual = plane.findIntersections(ray7);
-        assertEquals("orthogonal above failed", expected, actual);
+        assertNull("orthogonal after should not intersect", actual);
 
         // ray has origin on plane and is not orthogonal or parallel
         Ray ray8 = new Ray(new Point3D(0, 1, 0), new Vector(0, 1, 1));

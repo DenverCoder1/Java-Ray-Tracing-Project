@@ -43,6 +43,16 @@ public class Ray {
     return this.direction;
   }
 
+  /**
+   * Get the point after scaling the direction vector from the origin
+   * 
+   * @param t The scalar to multiply by
+   * @return The point scaled by the direction vector
+   */
+  public Point3D getPoint(double t) {
+    return origin.add(direction.scale(t));
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o == this)
