@@ -77,8 +77,9 @@ public class PlaneTests {
         assertNull("inside plane should be null", actual);
 
         // ray is parallel and does not intersection
-        Ray ray4 = new Ray(new Point3D(0, 1, 1), new Vector(0, 1, 0));
-        actual = plane.findIntersections(ray4);
+        Plane plane2 = new Plane(new Point3D(0, 0, 1), new Point3D(0, 1, 1), new Point3D(1, 0, 1));
+        Ray ray4 = new Ray(new Point3D(0.25, 0.25, 2), new Vector(0, 1, 0));
+        actual = plane2.findIntersections(ray4);
         assertNull("parallel ray should be null", actual);
 
         // **** group: orthogonal rays

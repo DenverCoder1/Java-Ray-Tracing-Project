@@ -1,6 +1,9 @@
 package geometries;
 
+import java.util.List;
+
 import primitives.Point3D;
+import primitives.Ray;
 import primitives.Vector;
 
 /**
@@ -27,5 +30,28 @@ public class Triangle extends Polygon {
   @Override
   public Vector getNormal(Point3D point) {
     return plane.getNormal();
+  }
+
+  @Override
+  public List<Point3D> findIntersections(Ray ray) {
+    Plane plane = new Plane(vertices.get(0), vertices.get(1), vertices.get(2));
+    List<Point3D> intersections = plane.findIntersections(ray);
+    if (intersections == null) {
+      return null;
+    }
+    Point3D intersection = intersections.get(0);
+    Vector v1 = vertices.get(0).subtract(ray.getOrigin());
+    Vector v2 = vertices.get(1).subtract(ray.getOrigin());
+    Vector v3 = vertices.get(2).subtract(ray.getOrigin());
+    Vector n1 = v1.crossProduct(v2).normalize();
+    Vector n2 = v2.crossProduct(v3).normalize();
+    Vector n3 = v3.crossProduct(v1).normalize();
+    double d1 = intersection.subtract(ray.getOrigin()).dotProduct(n1);
+    double d2 = intersection.subtract(ray.getOrigin()).dotProduct(n2);
+    double d3 = intersection.subtract(ray.getOrigin()).dotProduct(n3);
+    if ((d1 > 0 && d2 > 0 && d3 > 0) || (d1 < 0 && d2 < 0 && d3 < 0)) {
+      return List.of(intersection);
+    }
+    return null;
   }
 }

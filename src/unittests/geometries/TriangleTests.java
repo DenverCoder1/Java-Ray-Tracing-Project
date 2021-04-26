@@ -60,63 +60,78 @@ public class TriangleTests {
         // ============ Equivalence Partitions Tests ==============
 
         // has intersection
-        Ray ray1 = new Ray(new Point3D(0.5, 0.5, 0), new Vector(0, 0, 1));
+        Ray ray1 = new Ray(new Point3D(0.25, 0.25, 0), new Vector(0, 0, 1));
         expected = List.of(new Point3D(0.25, 0.25, 1));
         actual = triangle.findIntersections(ray1);
         assertEquals("has intersection failed", expected, actual);
 
-        // no intersection
+        // no intersection and reaches plane by side of triangle
         Ray ray2 = new Ray(new Point3D(2, 2, 0), new Vector(0, 0, 1));
         actual = triangle.findIntersections(ray2);
-        assertNull("no intersection should be null", actual);
+        assertNull("no intersection beside triangle should be null", actual);
+
+        // no intersection and reaches plane by corner
+        Ray ray3 = new Ray(new Point3D(2, -0.5, 1), new Vector(0, 0, 1));
+        actual = triangle.findIntersections(ray3);
+        assertNull("no intersection by corner should be null", actual);
 
         // =============== Boundary Values Tests ==================
 
         // **** group: parallel rays
 
         // ray has origin on the triangle and is parallel to the triangle
-        Ray ray3 = new Ray(new Point3D(0.25, 0.25, 1), new Vector(0, 1, 0));
-        actual = triangle.findIntersections(ray3);
+        Ray ray4 = new Ray(new Point3D(0.25, 0.25, 1), new Vector(0, 1, 0));
+        actual = triangle.findIntersections(ray4);
         assertNull("inside triangle should be null", actual);
 
         // ray is parallel and does not intersection
-        Ray ray4 = new Ray(new Point3D(0.25, 0.25, 2), new Vector(0, 1, 0));
-        actual = triangle.findIntersections(ray4);
+        Ray ray5 = new Ray(new Point3D(0.25, 0.25, 2), new Vector(0, 1, 0));
+        actual = triangle.findIntersections(ray5);
         assertNull("parallel ray should be null", actual);
 
         // **** group: orthogonal rays
 
         // ray has origin on the triangle and is orthogonal to the triangle
-        Ray ray5 = new Ray(new Point3D(0.25, 0.25, 1), new Vector(0, 0, 1));
-        actual = triangle.findIntersections(ray5);
+        Ray ray6 = new Ray(new Point3D(0.25, 0.25, 1), new Vector(0, 0, 1));
+        actual = triangle.findIntersections(ray6);
         assertNull("orthogonal with only origin on triangle should be null", actual);
 
         // ray starts before the triangle and is orthogonal to the triangle
-        Ray ray6 = new Ray(new Point3D(0.25, 0.25, 0), new Vector(0, 0, 1));
+        Ray ray7 = new Ray(new Point3D(0.25, 0.25, 0), new Vector(0, 0, 1));
         expected = List.of(new Point3D(0.25, 0.25, 1));
-        actual = triangle.findIntersections(ray6);
+        actual = triangle.findIntersections(ray7);
         assertEquals("orthogonal before failed", expected, actual);
 
         // ray starts after the triangle and is orthogonal to the triangle
-        Ray ray7 = new Ray(new Point3D(0.25, 0.25, 2), new Vector(0, 0, 1));
-        actual = triangle.findIntersections(ray7);
+        Ray ray8 = new Ray(new Point3D(0.25, 0.25, 2), new Vector(0, 0, 1));
+        actual = triangle.findIntersections(ray8);
         assertNull("orthogonal after should not intersect", actual);
 
-        // ray has origin on triangle and is not orthogonal or parallel
-        Ray ray8 = new Ray(new Point3D(0.25, 0.25, 1), new Vector(0, 1, 1));
-        actual = triangle.findIntersections(ray8);
+        // ray has origin on triangle and is not orthogonal
+        Ray ray9 = new Ray(new Point3D(0.25, 0.25, 1), new Vector(0, 1, 1));
+        actual = triangle.findIntersections(ray9);
         assertNull("Origin on triangle and not orthogonal failed", actual);
 
         // ray does not start on triangle and is not orthogonal or parallel
-        Ray ray9 = new Ray(new Point3D(0, 1, -1), new Vector(0, 1, 1));
-        expected = List.of(new Point3D(0.17, 0.17, 1));
-        actual = triangle.findIntersections(ray9);
+        Ray ray10 = new Ray(new Point3D(0.25, -1.25, -0.5), new Vector(0, 1, 1));
+        expected = List.of(new Point3D(0.25, 0.25, 1));
+        actual = triangle.findIntersections(ray10);
         assertEquals("not orthogonal or parallel failed", expected, actual);
 
         // ray crosses through the edge of the triangle
-        Ray ray10 = new Ray(new Point3D(0.5, 0.5, 0), new Vector(0, 0, 1));
-        actual = triangle.findIntersections(ray10);
-        assertNull("cross through edge failed", actual);
+        Ray ray11 = new Ray(new Point3D(0.5, 0.5, 0), new Vector(0, 0, 1));
+        actual = triangle.findIntersections(ray11);
+        assertNull("cross through edge should not intersect", actual);
+
+        // ray crosses through the corner of the triangle
+        Ray ray12 = new Ray(new Point3D(0, 1, 0), new Vector(0, 0, 1));
+        actual = triangle.findIntersections(ray12);
+        assertNull("ray through corner should not intersect", actual);
+
+        // ray through the line of the triangle but outside
+        Ray ray13 = new Ray(new Point3D(2, 0, 0), new Vector(0, 0, 1));
+        actual = triangle.findIntersections(ray13);
+        assertNull("ray crosses along line of triangle should not intersect", actual);
     }
 
 }
