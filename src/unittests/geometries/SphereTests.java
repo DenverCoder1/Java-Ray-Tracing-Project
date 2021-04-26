@@ -52,7 +52,7 @@ public class SphereTests {
         assertEquals("Ray crosses sphere", List.of(p1, p2), result);
 
         // TC03: Ray starts inside the sphere (1 point)
-        result = sphere.findIntersections(new Ray(new Point3D(1, 0, 0), new Vector(0, 0, 1)));
+        result = sphere.findIntersections(new Ray(new Point3D(0.75, 0, 0), new Vector(0, 0, 1)));
         assertEquals("Ray in sphere wrong number of points", 1, result.size());
 
         // TC04: Ray starts after the sphere (0 points)
