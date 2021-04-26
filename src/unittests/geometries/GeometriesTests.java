@@ -37,19 +37,19 @@ public class GeometriesTests {
         geometries = new Geometries(plane);
         expected = new Geometries(plane, sphere);
         geometries.add(sphere);
-        assertEquals(geometries, expected);
+        assertEquals("add geometry failed", geometries.getGeometryList(), expected.getGeometryList());
 
         // =============== Boundary Values Tests ==================
         // add empty list to geometries
         geometries = new Geometries(plane, sphere);
         geometries.add();
-        assertEquals(geometries, geometries);
+        assertEquals("empty list failed", geometries.getGeometryList(), geometries.getGeometryList());
 
         // add geometries to empty geometries
         geometries = new Geometries();
         expected = new Geometries(plane, sphere);
         geometries.add(plane, sphere);
-        assertEquals(geometries, expected);
+        assertEquals("add to empty failed", geometries.getGeometryList(), expected.getGeometryList());
     }
 
     /**
@@ -88,7 +88,7 @@ public class GeometriesTests {
         assertEquals("one geometry intersected failed", expected, actual);
 
         // all geometries are intersected
-        Ray ray3 = new Ray(new Point3D(0, 2, -1), new Vector(0, -1, 1));
+        Ray ray3 = new Ray(new Point3D(0, -2, -1), new Vector(0, 0, 1));
         expected = List.of(new Point3D(0, -2, 0), new Point3D(0, -2, 2), new Point3D(0, -2, 4));
         actual = geometries.findIntersections(ray3);
         assertEquals("all geometries intersected failed", expected, actual);

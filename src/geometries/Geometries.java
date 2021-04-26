@@ -1,5 +1,6 @@
 package geometries;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +15,6 @@ import primitives.Ray;
  * @author Elad Harizy
  */
 public class Geometries implements Intersectable {
-
     /**
      * List of geometries
      */
@@ -33,7 +33,11 @@ public class Geometries implements Intersectable {
      * @param geometries list of geometries
      */
     public Geometries(Intersectable... geometries) {
-        geometryList = List.of(geometries);
+        geometryList = new ArrayList<>(List.of(geometries));
+    }
+
+    public List<Intersectable> getGeometryList() {
+        return this.geometryList;
     }
 
     /**
@@ -42,6 +46,12 @@ public class Geometries implements Intersectable {
      * @param geometries list of geometries to add
      */
     public void add(Intersectable... geometries) {
+        // initialize list if empty
+        if (geometryList == null) {
+            geometryList = new ArrayList<>(List.of(geometries));
+            return;
+        }
+        // add geometries to existing list
         Collections.addAll(geometryList, geometries);
     }
 
@@ -58,13 +68,13 @@ public class Geometries implements Intersectable {
             List<Point3D> newPoints = iterator.next().findIntersections(ray);
             // make sure there are points
             if (newPoints != null) {
-                // add points if list exists already
-                if (intersections != null) {
-                    intersections.addAll(newPoints);
+                // otherwise, initialize with a list when first intersection found
+                if (intersections == null) {
+                    intersections = new ArrayList<>(newPoints);
                     continue;
                 }
-                // otherwise, initialize with a list when first intersection found
-                intersections = newPoints;
+                // add points if list exists already
+                intersections.addAll(newPoints);
             }
         }
         return intersections;
