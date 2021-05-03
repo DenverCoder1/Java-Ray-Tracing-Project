@@ -11,3 +11,5 @@ Jonah Lawrence & Elad Harizy
 * [Exercise 2](https://github.com/DenverCoder1/Java-Ray-Tracing-Project/tree/exercise-2)
 
 * [Exercise 3](https://github.com/DenverCoder1/Java-Ray-Tracing-Project/tree/exercise-3)
+
+* [Exercise 4](https://github.com/DenverCoder1/Java-Ray-Tracing-Project/tree/exercise-4)
