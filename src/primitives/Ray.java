@@ -3,6 +3,8 @@ package primitives;
 import java.util.List;
 import java.util.Objects;
 
+import geometries.Intersectable.GeoPoint;
+
 /**
  * Class Ray is the basic class representing a ray of Euclidean geometry in
  * Cartesian 3-Dimensional coordinate system
@@ -60,14 +62,14 @@ public class Ray {
    * @param pointsList intersections point List
    * @return closest point
    */
-  public Point3D findClosestPoint(List<Point3D> pointsList) {
-    Point3D result = null;
+  public GeoPoint findClosestGeoPoint(List<GeoPoint> pointsList) {
+    GeoPoint result = null;
     double closestDistance = Double.MAX_VALUE;
     if (pointsList == null) {
       return null;
     }
-    for (Point3D p : pointsList) {
-      double temp = p.distance(origin);
+    for (GeoPoint p : pointsList) {
+      double temp = p.getPoint().distance(origin);
       if (temp < closestDistance) {
         closestDistance = temp;
         result = p;
