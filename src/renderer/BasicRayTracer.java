@@ -13,13 +13,13 @@ import java.util.List;
  * @author Jonah Lawrence
  * @author Elad Harizy
  */
-public class RayTracerBasic extends RayTracerBase {
+public class BasicRayTracer extends RayTracerBase {
   /**
    * receives a scene and calls the base class constructor
    * 
    * @param scene
    */
-  public RayTracerBasic(Scene scene) {
+  public BasicRayTracer(Scene scene) {
     super(scene);
   }
 
