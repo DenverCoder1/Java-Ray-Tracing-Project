@@ -13,7 +13,7 @@ import primitives.Vector;
  * @author Jonah Lawrence
  * @author Elad Harizy
  */
-public class Plane implements Geometry {
+public class Plane extends Geometry {
   protected final Point3D origin;
   protected final Vector normal;
 
@@ -69,7 +69,7 @@ public class Plane implements Geometry {
   }
 
   @Override
-  public List<Point3D> findIntersections(Ray ray) {
+  public List<GeoPoint> findGeoIntersections(Ray ray) {
     try {
       // direction from ray's origin to a point on the plane
       Vector u = origin.subtract(ray.getOrigin());
@@ -77,7 +77,7 @@ public class Plane implements Geometry {
       double t = normal.dotProduct(u) / normal.dotProduct(ray.getDirection());
       // return the point if it is reached by the ray
       if (t > 0 && !Double.isInfinite(t)) {
-        return List.of(ray.getPoint(t));
+        return List.of(new GeoPoint(this, ray.getPoint(t)));
       }
     } catch (IllegalArgumentException e) {
       // ray has origin on the plane
