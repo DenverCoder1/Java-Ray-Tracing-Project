@@ -1,9 +1,5 @@
 package unittests.renderer;
 
-import java.io.File;
-import java.io.IOException;
-import java.awt.Desktop;
-
 import org.junit.Test;
 
 import elements.*;
@@ -46,17 +42,11 @@ public class RenderTests {
 		Render render = new Render() //
 				.setImageWriter(imageWriter) //
 				.setCamera(camera) //
-				.setRayTracer(new RayTracerBasic(scene));
+				.setRayTracer(new BasicRayTracer(scene));
 
 		render.renderImage();
 		render.printGrid(100, new Color(java.awt.Color.YELLOW));
-		File file = imageWriter.writeToImage();
-		// open in image viewer
-		try {
-			Desktop.getDesktop().open(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		render.writeToImage();
 	}
 
 	/**
@@ -72,7 +62,7 @@ public class RenderTests {
 		Render render = new Render() //
 				.setImageWriter(imageWriter) //
 				.setCamera(camera) //
-				.setRayTracer(new RayTracerBasic(scene));
+				.setRayTracer(new BasicRayTracer(scene));
 
 		render.renderImage();
 		render.printGrid(100, new Color(java.awt.Color.YELLOW));
@@ -103,7 +93,7 @@ public class RenderTests {
 		Render render = new Render() //
 				.setImageWriter(imageWriter) //
 				.setCamera(camera) //
-				.setRayTracer(new RayTracerBasic(scene));
+				.setRayTracer(new BasicRayTracer(scene));
 
 		render.renderImage();
 		render.printGrid(100, new Color(java.awt.Color.WHITE));
