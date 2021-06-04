@@ -50,6 +50,8 @@ public class Triangle extends Polygon {
     double d2 = intersection.getPoint().subtract(ray.getOrigin()).dotProduct(n2);
     double d3 = intersection.getPoint().subtract(ray.getOrigin()).dotProduct(n3);
     if ((d1 > 0 && d2 > 0 && d3 > 0) || (d1 < 0 && d2 < 0 && d3 < 0)) {
+      // change geometry to triangle instead of plane
+      intersection = new GeoPoint(this, intersection.getPoint());
       return List.of(intersection);
     }
     return null;
