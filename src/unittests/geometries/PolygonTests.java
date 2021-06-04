@@ -95,10 +95,11 @@ public class PolygonTests {
     }
 
     /**
-     * Test method for {@link geometries.Polygon#findIntersections(primitives.Ray)}.
+     * Test method for
+     * {@link geometries.Polygon#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testFindIntersections() {
+    public void testfindGeoIntersections() {
         // TODO: Implement
     }
 

@@ -32,10 +32,10 @@ public class CylinderTests {
 
     /**
      * Test method for
-     * {@link geometries.Cylinder#findIntersections(primitives.Ray)}.
+     * {@link geometries.Cylinder#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testFindIntersections() {
+    public void testfindGeoIntersections() {
         // TODO: Implement
     }
 }

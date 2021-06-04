@@ -31,10 +31,10 @@ public class TubeTests {
     }
 
     /**
-     * Test method for {@link geometries.Tube#findIntersections(primitives.Ray)}.
+     * Test method for {@link geometries.Tube#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testFindIntersections() {
+    public void testfindGeoIntersections() {
         // TODO: Implement
     }
 }
