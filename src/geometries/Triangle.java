@@ -46,12 +46,12 @@ public class Triangle extends Polygon {
     Vector n1 = v1.crossProduct(v2).normalize();
     Vector n2 = v2.crossProduct(v3).normalize();
     Vector n3 = v3.crossProduct(v1).normalize();
-    double d1 = intersection.getPoint().subtract(ray.getOrigin()).dotProduct(n1);
-    double d2 = intersection.getPoint().subtract(ray.getOrigin()).dotProduct(n2);
-    double d3 = intersection.getPoint().subtract(ray.getOrigin()).dotProduct(n3);
+    double d1 = intersection.point.subtract(ray.getOrigin()).dotProduct(n1);
+    double d2 = intersection.point.subtract(ray.getOrigin()).dotProduct(n2);
+    double d3 = intersection.point.subtract(ray.getOrigin()).dotProduct(n3);
     if ((d1 > 0 && d2 > 0 && d3 > 0) || (d1 < 0 && d2 < 0 && d3 < 0)) {
       // change geometry to triangle instead of plane
-      intersection = new GeoPoint(this, intersection.getPoint());
+      intersection = new GeoPoint(this, intersection.point);
       return List.of(intersection);
     }
     return null;

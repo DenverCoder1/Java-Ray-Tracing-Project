@@ -1,6 +1,7 @@
 package geometries;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import primitives.Point3D;
 import primitives.Ray;
@@ -31,24 +32,6 @@ public interface Intersectable {
             point = p;
         }
 
-        /**
-         * get point
-         * 
-         * @return point
-         */
-        public Point3D getPoint() {
-            return point;
-        }
-
-        /**
-         * get geometry
-         * 
-         * @return geometry
-         */
-        public Geometry getGeometry() {
-            return geometry;
-        }
-
         @Override
         public boolean equals(Object o) {
             // object is self
@@ -67,6 +50,11 @@ public interface Intersectable {
             // Compare the data members and return accordingly
             return g.geometry.equals(geometry) && g.point.equals(point);
         }
+    }
+
+    default List<Point3D> findIntersections(Ray ray) {
+        var geoList = findGeoIntersections(ray);
+        return geoList == null ? null : geoList.stream().map(gp -> gp.point).collect(Collectors.toList());
     }
 
     /**

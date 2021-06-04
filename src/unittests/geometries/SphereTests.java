@@ -48,7 +48,7 @@ public class SphereTests {
         GeoPoint p2 = new GeoPoint(sphere, new Point3D(1.53484692283495, 0.844948974278318, 0));
         result = sphere.findGeoIntersections(new Ray(new Point3D(-1, 0, 0), new Vector(3, 1, 0)));
         assertEquals("Ray crossing sphere wrong number of points", 2, result.size());
-        if (result.get(0).getPoint().getX() > result.get(1).getPoint().getX()) {
+        if (result.get(0).point.getX() > result.get(1).point.getX()) {
             result = List.of(result.get(1), result.get(0));
         }
         assertEquals("Ray crosses sphere", List.of(p1, p2), result);

@@ -69,7 +69,7 @@ public class Ray {
       return null;
     }
     for (GeoPoint p : pointsList) {
-      double temp = p.getPoint().distance(origin);
+      double temp = p.point.distance(origin);
       if (temp < closestDistance) {
         closestDistance = temp;
         result = p;
