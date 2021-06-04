@@ -1,9 +1,6 @@
 package unittests.renderer;
 
 import org.junit.Test;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
 
 import primitives.Color;
 import renderer.ImageWriter;
@@ -34,13 +31,7 @@ public class ImageWriterTest {
         }
       }
     }
-    File file = imageWriter.writeToImage();
-    // open in image viewer
-    try {
-      Desktop.getDesktop().open(file);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    imageWriter.writeToImage();
   }
 
 }
