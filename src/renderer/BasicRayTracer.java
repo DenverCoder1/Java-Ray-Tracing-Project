@@ -1,7 +1,6 @@
 package renderer;
 
 import primitives.Color;
-import primitives.Point3D;
 import primitives.Ray;
 import scene.Scene;
 
