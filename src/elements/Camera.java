@@ -2,7 +2,6 @@ package elements;
 
 import primitives.Point3D;
 import primitives.Ray;
-import primitives.Util;
 import primitives.Vector;
 
 import static primitives.Util.isZero;
@@ -33,7 +32,7 @@ public class Camera {
      * @throws IllegalArumentException
      */
     public Camera(Point3D newOrigin, Vector newVTo, Vector newVUp) {
-        if (!Util.isZero(newVUp.dotProduct(newVTo))) {
+        if (!isZero(newVUp.dotProduct(newVTo))) {
             throw new IllegalArgumentException("The vectors are not orthogonal.");
         }
         origin = newOrigin;

@@ -13,7 +13,7 @@ abstract class Light {
   /**
    * light intensity color
    */
-  private Color intensity;
+  protected Color intensity;
 
   /**
    * constructor for light
