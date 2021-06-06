@@ -95,6 +95,7 @@ public class Scene {
 
   /**
    * @param newBackground the background to set
+   * @return scene object
    */
   public Scene setBackground(Color newBackground) {
     this.background = newBackground;
@@ -103,6 +104,7 @@ public class Scene {
 
   /**
    * @param newAmbientLight the ambientLight to set
+   * @return scene object
    */
   public Scene setAmbientLight(AmbientLight newAmbientLight) {
     this.ambientLight = newAmbientLight;
@@ -111,6 +113,7 @@ public class Scene {
 
   /**
    * @param newDistance the distance to set
+   * @return scene object
    */
   public Scene setDistance(double newDistance) {
     this.distance = newDistance;
@@ -119,6 +122,7 @@ public class Scene {
 
   /**
    * @param camera the camera to set
+   * @return scene object
    */
   public Scene setCamera(Camera camera) {
     this.camera = camera;
@@ -129,6 +133,7 @@ public class Scene {
    * add geometries to the scene
    * 
    * @param geometries to add to the scene
+   * @return scene object
    */
   public Scene addGeometries(Intersectable... newGeometries) {
     geometries.add(newGeometries);
@@ -137,6 +142,7 @@ public class Scene {
 
   /**
    * @param newLights the lights to set
+   * @return scene object
    */
   public Scene setDistance(List<LightSource> newLights) {
     this.lights = newLights;
