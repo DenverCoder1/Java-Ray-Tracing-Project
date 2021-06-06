@@ -48,7 +48,7 @@ public class Material {
    * 
    * @param kd
    */
-  public Material setKD(int kd) {
+  public Material setKD(double kd) {
     this.kD = kd;
     return this;
   }
@@ -58,7 +58,7 @@ public class Material {
    * 
    * @param ks
    */
-  public Material setKS(int ks) {
+  public Material setKS(double ks) {
     this.kS = ks;
     return this;
   }

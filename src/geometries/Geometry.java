@@ -22,7 +22,7 @@ public abstract class Geometry implements Intersectable {
   /**
    * material
    */
-  protected Material material = new Material();
+  public Material material = new Material();
 
   /**
    * get emission color
@@ -40,6 +40,15 @@ public abstract class Geometry implements Intersectable {
    */
   public Material getMaterial() {
     return this.material;
+  }
+
+  /**
+   * get material shininess
+   * 
+   * @return material shininess
+   */
+  public int getShininess() {
+    return this.material.nShininess;
   }
 
   /**
