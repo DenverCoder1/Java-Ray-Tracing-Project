@@ -21,11 +21,6 @@ public class Render {
   private ImageWriter imageWriter;
 
   /**
-   * camera
-   */
-  private Camera camera;
-
-  /**
    * ray tracer base with scene
    */
   private RayTracerBase rayTracer;
@@ -55,21 +50,21 @@ public class Render {
       if (imageWriter == null) {
         throw new MissingResourceException("missing image writer", ImageWriter.class.getName(), "");
       }
-      if (camera == null) {
-        throw new MissingResourceException("missing camera", Camera.class.getName(), "");
-      }
       if (rayTracer == null) {
         throw new MissingResourceException("missing ray tracer", RayTracerBase.class.getName(), "");
       }
-      if (rayTracer.getScene() == null) {
+      if (rayTracer.scene == null) {
         throw new MissingResourceException("missing scene", Scene.class.getName(), "");
+      }
+      if (rayTracer.scene.getCamera() == null) {
+        throw new MissingResourceException("missing camera", Camera.class.getName(), "");
       }
       // rendering the image
       int nX = imageWriter.getNx();
       int nY = imageWriter.getNy();
       for (int i = 0; i < nY; i++) {
         for (int j = 0; j < nX; j++) {
-          Ray ray = camera.constructRayThroughPixel(nX, nY, j, i);
+          Ray ray = rayTracer.scene.getCamera().constructRayThroughPixel(nX, nY, j, i);
           Color pixelColor = rayTracer.traceRay(ray);
           imageWriter.writePixel(j, i, pixelColor);
         }
@@ -116,17 +111,6 @@ public class Render {
   }
 
   /**
-   * set camera
-   * 
-   * @param c
-   * @return the Render object
-   */
-  public Render setCamera(Camera c) {
-    this.camera = c;
-    return this;
-  }
-
-  /**
    * set ray tracer
    * 
    * @param rayTracerBasic
@@ -136,4 +120,5 @@ public class Render {
     this.rayTracer = rayTracerBasic;
     return this;
   }
+
 }

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import elements.AmbientLight;
+import elements.Camera;
 import elements.LightSource;
 import geometries.Geometries;
 import geometries.Intersectable;
@@ -41,12 +42,17 @@ public class Scene {
   /**
    * the distance of the camera from the view plane
    */
+  private Camera camera;
+
+  /**
+   * the distance of the camera from the view plane
+   */
   private double distance;
 
   /**
    * list of lights
    */
-  private List<LightSource> lights;
+  public List<LightSource> lights;
 
   /**
    * construct scene with defaults
@@ -74,6 +80,20 @@ public class Scene {
   }
 
   /**
+   * @return the camera
+   */
+  public Camera getCamera() {
+    return camera;
+  }
+
+  /**
+   * @return the lights
+   */
+  public List<LightSource> getLights() {
+    return lights;
+  }
+
+  /**
    * @param newBackground the background to set
    */
   public Scene setBackground(Color newBackground) {
@@ -94,6 +114,14 @@ public class Scene {
    */
   public Scene setDistance(double newDistance) {
     this.distance = newDistance;
+    return this;
+  }
+
+  /**
+   * @param camera the camera to set
+   */
+  public Scene setCamera(Camera camera) {
+    this.camera = camera;
     return this;
   }
 
