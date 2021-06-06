@@ -7,6 +7,10 @@ import scene.Scene;
 
 import java.util.MissingResourceException;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Generate the picture according to a scene
  * 
@@ -30,14 +34,30 @@ public class Render {
    * 
    * @throws UnsupportedOperationException if image writer is missing
    */
-  public void writeToImage() {
+  public File writeToImage() {
     try {
       if (imageWriter == null)
         throw new MissingResourceException("image writer is missing", ImageWriter.class.getName(), "");
     } catch (MissingResourceException e) {
       throw new UnsupportedOperationException("Image writer not implemented");
     }
-    imageWriter.writeToImage();
+    return imageWriter.writeToImage();
+  }
+
+  /**
+   * write image writer to image file and open in image viewer
+   * 
+   * @throws UnsupportedOperationException if image writer is missing
+   */
+  public void writeToImageAndOpen() {
+    // write image to file
+    File file = writeToImage();
+    // open in image viewer
+    try {
+      Desktop.getDesktop().open(file);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
