@@ -21,7 +21,7 @@ public class Material {
   /**
    * shininess
    */
-  public int shininess;
+  public int nShininess;
 
   /**
    * constructor
@@ -33,7 +33,14 @@ public class Material {
   public Material(double kd, double ks, int shininess) {
     this.kD = kd;
     this.kS = ks;
-    this.shininess = shininess;
+    this.nShininess = shininess;
+  }
+
+  /**
+   * default constructor
+   */
+  public Material() {
+    this(0, 0, 0);
   }
 
   /**
@@ -62,7 +69,7 @@ public class Material {
    * @param shininess
    */
   public Material setShininess(int shininess) {
-    this.shininess = shininess;
+    this.nShininess = shininess;
     return this;
   }
 }
