@@ -1,6 +1,10 @@
 package scene;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import elements.AmbientLight;
+import elements.LightSource;
 import geometries.Geometries;
 import geometries.Intersectable;
 import primitives.Color;
@@ -40,6 +44,11 @@ public class Scene {
   private double distance;
 
   /**
+   * list of lights
+   */
+  private List<LightSource> lights;
+
+  /**
    * construct scene with defaults
    */
   public Scene(String sceneName) {
@@ -47,6 +56,7 @@ public class Scene {
     background = Color.BLACK;
     ambientLight = new AmbientLight(new Color(192, 192, 192), 1.d);
     geometries = new Geometries();
+    lights = new LinkedList<>();
   }
 
   /**
@@ -94,6 +104,14 @@ public class Scene {
    */
   public Scene addGeometries(Intersectable... newGeometries) {
     geometries.add(newGeometries);
+    return this;
+  }
+
+  /**
+   * @param newLights the lights to set
+   */
+  public Scene setDistance(List<LightSource> newLights) {
+    this.lights = newLights;
     return this;
   }
 }
