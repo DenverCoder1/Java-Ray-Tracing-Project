@@ -79,14 +79,15 @@ public class Render {
       if (rayTracer.scene.getCamera() == null) {
         throw new MissingResourceException("missing camera", Camera.class.getName(), "");
       }
+      Camera camera = rayTracer.scene.getCamera();
       // rendering the image
       int nX = imageWriter.getNx();
       int nY = imageWriter.getNy();
-      for (int i = 0; i < nY; i++) {
-        for (int j = 0; j < nX; j++) {
-          Ray ray = rayTracer.scene.getCamera().constructRayThroughPixel(nX, nY, j, i);
+      for (int row = 0; row < nY; row++) {
+        for (int col = 0; col < nX; col++) {
+          Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
           Color pixelColor = rayTracer.traceRay(ray);
-          imageWriter.writePixel(j, i, pixelColor);
+          imageWriter.writePixel(col, row, pixelColor);
         }
       }
     } catch (MissingResourceException e) {
