@@ -35,7 +35,7 @@ public class CylinderTests {
      * {@link geometries.Cylinder#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testfindGeoIntersections() {
+    public void testFindGeoIntersections() {
         // TODO: Implement
     }
 }

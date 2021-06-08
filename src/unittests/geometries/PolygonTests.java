@@ -99,7 +99,7 @@ public class PolygonTests {
      * {@link geometries.Polygon#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testfindGeoIntersections() {
+    public void testFindGeoIntersections() {
         // TODO: Implement
     }
 
