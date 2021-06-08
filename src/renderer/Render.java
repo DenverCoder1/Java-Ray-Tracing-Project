@@ -45,18 +45,24 @@ public class Render {
   }
 
   /**
-   * write image writer to image file and open in image viewer
+   * write image writer to image file and open in vscode or default image viewer
    * 
    * @throws UnsupportedOperationException if image writer is missing
    */
   public void writeToImageAndOpen() {
     // write image to file
     File file = writeToImage();
-    // open in image viewer
     try {
-      Desktop.getDesktop().open(file);
-    } catch (IOException e) {
-      e.printStackTrace();
+      // open in vscode
+      new ProcessBuilder("code", "-r", file.getAbsolutePath()).start();
+    } catch (IOException e1) {
+      try {
+        // open in default program
+        Desktop.getDesktop().open(file);
+      } catch (IOException e2) {
+        // print stack trace
+        e2.printStackTrace();
+      }
     }
   }
 
