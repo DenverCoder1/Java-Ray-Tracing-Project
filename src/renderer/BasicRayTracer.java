@@ -22,7 +22,6 @@ import static primitives.Util.*;
  */
 public class BasicRayTracer extends RayTracerBase {
 
-  private static final double DELTA = 0.1;
   private static final int MAX_CALC_COLOR_LEVEL = 10;
   private static final double MIN_CALC_COLOR_K = 0.001;
 
@@ -71,9 +70,7 @@ public class BasicRayTracer extends RayTracerBase {
     double kkr = k * kr;
     Vector n = geopoint.geometry.getNormal(geopoint.point);
     if (kkr > MIN_CALC_COLOR_K) {
-      Vector delta = n.scale(n.dotProduct(ray.getDirection().scale(-1)) > 0 ? DELTA : -DELTA);
-      Point3D point = geopoint.point.add(delta);
-      Ray reflectedRay = constructReflectedRay(point, ray, n);
+      Ray reflectedRay = constructReflectedRay(geopoint.point, ray, n);
       if (reflectedRay != null) {
         List<GeoPoint> intersections = scene.geometries.findGeoIntersections(reflectedRay);
         GeoPoint reflectedPoint = reflectedRay.findClosestGeoPoint(intersections);
@@ -85,9 +82,7 @@ public class BasicRayTracer extends RayTracerBase {
     double kt = geopoint.geometry.getMaterial().kT;
     double kkt = k * kt;
     if (kkt > MIN_CALC_COLOR_K) {
-      Vector delta = n.scale(n.dotProduct(ray.getDirection()) > 0 ? DELTA : -DELTA);
-      Point3D point = geopoint.point.add(delta);
-      Ray refractedRay = new Ray(point, ray.getDirection());
+      Ray refractedRay = new Ray(geopoint.point, ray.getDirection(), n);
       List<GeoPoint> intersections = scene.geometries.findGeoIntersections(refractedRay);
       GeoPoint refractedPoint = refractedRay.findClosestGeoPoint(intersections);
       if (refractedPoint != null)
@@ -188,10 +183,9 @@ public class BasicRayTracer extends RayTracerBase {
    */
   private boolean unshaded(Vector l, Vector n, GeoPoint geopoint, LightSource lightSource) {
     Vector lightDirection = l.scale(-1); // from point to light source
-    Vector delta = n.scale(n.dotProduct(lightDirection) > 0 ? DELTA : -DELTA);
-    Point3D point = geopoint.point.add(delta);
-    Ray lightRay = new Ray(point, lightDirection);
-    List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay, lightSource.getDistance(point));
+    Ray lightRay = new Ray(geopoint.point, lightDirection, n);
+    List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay,
+        lightSource.getDistance(geopoint.point));
     if (intersections == null)
       return true;
     double lightDistance = lightSource.getDistance(geopoint.point);
@@ -217,6 +211,6 @@ public class BasicRayTracer extends RayTracerBase {
       return null;
     }
     Vector r = v.subtract(n.scale(2 * vn));
-    return new Ray(point, r);
+    return new Ray(point, r, n);
   }
 }
