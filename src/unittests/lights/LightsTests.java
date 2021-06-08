@@ -86,6 +86,27 @@ public class LightsTests {
 	}
 
 	/**
+	 * Produce a picture of a sphere lighted by multiple light sources
+	 */
+	@Test
+	public void multipleLightSources() {
+		scene1.geometries.add(sphere);
+		scene1.lights.add(new SpotLight(new Color(500, 300, 0), new Point3D(-50, -50, 50), new Vector(1, 1, -2)) //
+				.setKL(0.00001).setKQ(0.00000001));
+		scene1.lights.add(new PointLight(new Color(500, 300, 0), new Point3D(-50, -50, 50))//
+				.setKL(0.00001).setKQ(0.000001));
+		scene1.lights.add(new DirectionalLight(new Color(500, 300, 0), new Vector(1, 1, -1)));
+		scene1.setCamera(camera1);
+
+		ImageWriter imageWriter = new ImageWriter("lightSphereMultiple", 500, 500);
+		Render render = new Render()//
+				.setImageWriter(imageWriter) //
+				.setRayTracer(new BasicRayTracer(scene1));
+		render.renderImage();
+		render.writeToImage();
+	}
+
+	/**
 	 * Produce a picture of a two triangles lighted by a directional light
 	 */
 	@Test
