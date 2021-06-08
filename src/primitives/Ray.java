@@ -14,7 +14,16 @@ import geometries.Intersectable.GeoPoint;
  */
 public class Ray {
 
+  private static final double DELTA = 0.1;
+
+  /**
+   * ray origin
+   */
   final Point3D origin;
+
+  /**
+   * ray direction vector
+   */
   final Vector direction;
 
   /**
@@ -26,6 +35,20 @@ public class Ray {
   public Ray(Point3D origin, Vector direction) {
     this.origin = origin;
     this.direction = direction.normalized();
+  }
+
+  /**
+   * constructor that moves point by a constant delta in a certain direction
+   * 
+   * @param origin    the origin point
+   * @param direction the direction vector
+   * @param normal    normal vector for displacement direction
+   */
+  public Ray(Point3D point, Vector direction, Vector normal) {
+    this.direction = direction.normalized();
+    double dotProduct = normal.dotProduct(this.direction);
+    Vector delta = normal.scale(dotProduct >= 0 ? DELTA : -DELTA);
+    this.origin = point.add(delta);
   }
 
   /**
