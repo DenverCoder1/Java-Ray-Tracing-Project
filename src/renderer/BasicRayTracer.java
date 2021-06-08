@@ -14,14 +14,15 @@ import geometries.Intersectable.GeoPoint;
 import static primitives.Util.*;
 
 /**
- * RayTracerBasic class inherits from RayTracerBase
+ * BasicRayTracer inherits from the abstract class RayTracerBase
  * 
  * @author Jonah Lawrence
  * @author Elad Harizy
  */
 public class BasicRayTracer extends RayTracerBase {
+
   /**
-   * receives a scene and calls the base class constructor
+   * constructor
    * 
    * @param scene
    */
@@ -30,8 +31,8 @@ public class BasicRayTracer extends RayTracerBase {
   }
 
   /**
-   * Find intersections between ray and scene geometries. Returns black if there
-   * are no intersections or finds to closest to calculate the color.
+   * Finds the color at the closest intersection point or returns the background
+   * color if no intersection points are found
    * 
    * @param ray
    * @return Color
@@ -43,7 +44,7 @@ public class BasicRayTracer extends RayTracerBase {
       GeoPoint closestPoint = ray.findClosestGeoPoint(intersections);
       return calcColor(closestPoint, ray);
     }
-    // ray did not intersect any geometrical object
+    // no intersections
     return scene.background;
   }
 
