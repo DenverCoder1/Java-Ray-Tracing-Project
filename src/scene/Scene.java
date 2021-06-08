@@ -40,14 +40,9 @@ public class Scene {
   public Geometries geometries;
 
   /**
-   * the distance of the camera from the view plane
+   * the camera
    */
   private Camera camera;
-
-  /**
-   * the distance of the camera from the view plane
-   */
-  private double distance;
 
   /**
    * list of lights
@@ -60,7 +55,7 @@ public class Scene {
   public Scene(String sceneName) {
     name = sceneName;
     background = Color.BLACK;
-    ambientLight = new AmbientLight(new Color(192, 192, 192), 1.d);
+    ambientLight = new AmbientLight(Color.BLACK, 0);
     geometries = new Geometries();
     lights = new LinkedList<>();
   }
@@ -70,13 +65,6 @@ public class Scene {
    */
   public String getName() {
     return name;
-  }
-
-  /**
-   * @return the distance
-   */
-  public double getDistance() {
-    return distance;
   }
 
   /**
@@ -112,15 +100,6 @@ public class Scene {
   }
 
   /**
-   * @param newDistance the distance to set
-   * @return scene object
-   */
-  public Scene setDistance(double newDistance) {
-    this.distance = newDistance;
-    return this;
-  }
-
-  /**
    * @param camera the camera to set
    * @return scene object
    */
@@ -144,7 +123,7 @@ public class Scene {
    * @param newLights the lights to set
    * @return scene object
    */
-  public Scene setDistance(List<LightSource> newLights) {
+  public Scene setLights(List<LightSource> newLights) {
     this.lights = newLights;
     return this;
   }

@@ -45,18 +45,24 @@ public class Render {
   }
 
   /**
-   * write image writer to image file and open in image viewer
+   * write image writer to image file and open in vscode or default image viewer
    * 
    * @throws UnsupportedOperationException if image writer is missing
    */
   public void writeToImageAndOpen() {
     // write image to file
     File file = writeToImage();
-    // open in image viewer
     try {
-      Desktop.getDesktop().open(file);
-    } catch (IOException e) {
-      e.printStackTrace();
+      // open in vscode
+      new ProcessBuilder("code", "-r", file.getAbsolutePath()).start();
+    } catch (IOException e1) {
+      try {
+        // open in default program
+        Desktop.getDesktop().open(file);
+      } catch (IOException e2) {
+        // print stack trace
+        e2.printStackTrace();
+      }
     }
   }
 
@@ -79,14 +85,15 @@ public class Render {
       if (rayTracer.scene.getCamera() == null) {
         throw new MissingResourceException("missing camera", Camera.class.getName(), "");
       }
+      Camera camera = rayTracer.scene.getCamera();
       // rendering the image
       int nX = imageWriter.getNx();
       int nY = imageWriter.getNy();
-      for (int i = 0; i < nY; i++) {
-        for (int j = 0; j < nX; j++) {
-          Ray ray = rayTracer.scene.getCamera().constructRayThroughPixel(nX, nY, j, i);
+      for (int row = 0; row < nY; row++) {
+        for (int col = 0; col < nX; col++) {
+          Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
           Color pixelColor = rayTracer.traceRay(ray);
-          imageWriter.writePixel(j, i, pixelColor);
+          imageWriter.writePixel(col, row, pixelColor);
         }
       }
     } catch (MissingResourceException e) {
