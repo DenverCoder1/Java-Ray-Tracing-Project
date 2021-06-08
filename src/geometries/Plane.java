@@ -6,6 +6,8 @@ import primitives.Point3D;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.*;
+
 /**
  * Class Plane is the basic class representing a plane of Euclidean geometry in
  * Cartesian 3-Dimensional coordinate system
@@ -69,14 +71,14 @@ public class Plane extends Geometry {
   }
 
   @Override
-  public List<GeoPoint> findGeoIntersections(Ray ray) {
+  public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
     try {
       // direction from ray's origin to a point on the plane
       Vector u = origin.subtract(ray.getOrigin());
       // distance from ray's origin to the point
       double t = normal.dotProduct(u) / normal.dotProduct(ray.getDirection());
       // return the point if it is reached by the ray
-      if (t > 0 && !Double.isInfinite(t)) {
+      if (t > 0 && !Double.isInfinite(t) && alignZero(maxDistance - t) >= 0) {
         return List.of(new GeoPoint(this, ray.getPoint(t)));
       }
     } catch (IllegalArgumentException e) {

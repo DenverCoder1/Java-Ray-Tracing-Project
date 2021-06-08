@@ -54,7 +54,7 @@ public class TriangleTests {
      * {@link geometries.Triangle#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testfindGeoIntersections() {
+    public void testFindGeoIntersections() {
         List<GeoPoint> expected;
         List<GeoPoint> actual;
         Triangle triangle = new Triangle(new Point3D(0, 0, 1), new Point3D(0, 1, 1), new Point3D(1, 0, 1));

@@ -33,7 +33,7 @@ public class SphereTests {
      * {@link geometries.Sphere#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testfindGeoIntersections() {
+    public void testFindGeoIntersections() {
         List<GeoPoint> result;
         Sphere sphere = new Sphere(new Point3D(1, 0, 0), 1d);
 
