@@ -78,6 +78,24 @@ public class Camera {
     }
 
     /**
+     * getter for height
+     * 
+     * @return height
+     */
+    public double getHeight() {
+        return height;
+    }
+
+    /**
+     * getter for width
+     * 
+     * @return width
+     */
+    public double getWidth() {
+        return width;
+    }
+
+    /**
      * Set view plane size
      *
      * @param width

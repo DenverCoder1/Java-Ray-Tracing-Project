@@ -2,9 +2,13 @@ package renderer;
 
 import elements.Camera;
 import primitives.Color;
+import primitives.Point3D;
 import primitives.Ray;
+import primitives.Vector;
 import scene.Scene;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.MissingResourceException;
 
 import java.awt.Desktop;
@@ -79,26 +83,72 @@ public class Render {
       if (rayTracer == null) {
         throw new MissingResourceException("missing ray tracer", RayTracerBase.class.getName(), "");
       }
-      if (rayTracer.scene == null) {
+      Scene scene = rayTracer.scene;
+      if (scene == null) {
         throw new MissingResourceException("missing scene", Scene.class.getName(), "");
       }
-      if (rayTracer.scene.getCamera() == null) {
+      if (scene.getCamera() == null) {
         throw new MissingResourceException("missing camera", Camera.class.getName(), "");
       }
-      Camera camera = rayTracer.scene.getCamera();
+      Camera camera = scene.getCamera();
       // rendering the image
       int nX = imageWriter.getNx();
       int nY = imageWriter.getNy();
       for (int row = 0; row < nY; row++) {
         for (int col = 0; col < nX; col++) {
           Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
-          Color pixelColor = rayTracer.traceRay(ray);
+          Color pixelColor = Color.BLACK;
+          // supersampling is enabled
+          if (scene.supersamplingEnabled) {
+            List<Ray> supersamplingRays = getSupersamplingRays(ray, scene.supersamplingGridSize);
+            // add the intersected colors together
+            for (Ray r : supersamplingRays) {
+              pixelColor = pixelColor.add(rayTracer.traceRay(r));
+            }
+            // divide by the number of rays
+            pixelColor = pixelColor.reduce(supersamplingRays.size());
+          }
+          // no supersampling
+          else {
+            pixelColor = rayTracer.traceRay(ray);
+          }
           imageWriter.writePixel(col, row, pixelColor);
         }
       }
     } catch (MissingResourceException e) {
       throw new UnsupportedOperationException("Missing " + e.getClassName());
     }
+  }
+
+  /**
+   * Get the rays for supersampling
+   * 
+   * @param ray      ray for original pixel location
+   * @param gridSize number of rows and columns for dividing pixel
+   * @return supersampling rays
+   */
+  private List<Ray> getSupersamplingRays(Ray ray, int gridSize) {
+    Scene scene = rayTracer.scene;
+    Camera camera = scene.getCamera();
+    Point3D pixel = ray.getOrigin();
+    double pixelHeight = camera.getHeight() / imageWriter.getNy();
+    double pixelWidth = camera.getWidth() / imageWriter.getNx();
+    Vector vRight = scene.getCamera().getVRight();
+    Vector vUp = scene.getCamera().getVUp();
+    Point3D cameraOrigin = scene.getCamera().getOrigin();
+    // list for returning rays
+    List<Ray> supersamplingRays = new ArrayList<>();
+    pixel = pixel.add(vRight.scale(-pixelWidth / 2));
+    pixel = pixel.add(vUp.scale(-pixelHeight / 2));
+    // create grid of points for supersampling
+    for (int row = 0; row < gridSize; row++) {
+      for (int col = 0; col < gridSize; col++) {
+        Point3D newPixel = pixel.add(vUp.scale(row * (pixelHeight / (gridSize - 1))))
+            .add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
+        supersamplingRays.add(new Ray(newPixel, newPixel.subtract(cameraOrigin)));
+      }
+    }
+    return supersamplingRays;
   }
 
   /**

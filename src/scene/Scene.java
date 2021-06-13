@@ -50,7 +50,24 @@ public class Scene {
   public List<LightSource> lights;
 
   /**
+   * whether or not supersampling is enabled
+   */
+  public boolean supersamplingEnabled;
+
+  /**
+   * number of rows and columns for supersampling
+   */
+  public int supersamplingGridSize;
+
+  /**
+   * whether or not adaptive supersampling is enabled
+   */
+  public boolean adaptiveSupersamplingEnabled;
+
+  /**
    * construct scene with defaults
+   * 
+   * @param sceneName
    */
   public Scene(String sceneName) {
     name = sceneName;
@@ -58,6 +75,9 @@ public class Scene {
     ambientLight = new AmbientLight(Color.BLACK, 0);
     geometries = new Geometries();
     lights = new LinkedList<>();
+    supersamplingEnabled = true;
+    supersamplingGridSize = 9;
+    adaptiveSupersamplingEnabled = true;
   }
 
   /**
@@ -120,11 +140,46 @@ public class Scene {
   }
 
   /**
+   * set lights
+   * 
    * @param newLights the lights to set
    * @return scene object
    */
   public Scene setLights(List<LightSource> newLights) {
     this.lights = newLights;
+    return this;
+  }
+
+  /**
+   * set supersampling on or off
+   * 
+   * @param enabled whether or not to enable
+   * @return scene object
+   */
+  public Scene setSupersampling(boolean enabled) {
+    this.supersamplingEnabled = enabled;
+    return this;
+  }
+
+  /**
+   * set supersampling grid size
+   * 
+   * @param gridSize number of rows/cols
+   * @return scene object
+   */
+  public Scene setSupersamplingGridSize(int gridSize) {
+    this.supersamplingGridSize = gridSize;
+    return this;
+  }
+
+  /**
+   * set adaptive supersampling on or off
+   * 
+   * @param enabled whether or not to enable
+   * @return scene object
+   */
+  public Scene setAdaptiveSupersampling(boolean enabled) {
+    this.adaptiveSupersamplingEnabled = enabled;
     return this;
   }
 }
