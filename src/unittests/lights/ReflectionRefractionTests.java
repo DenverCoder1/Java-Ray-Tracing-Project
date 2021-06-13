@@ -11,6 +11,7 @@ import geometries.Triangle;
 import primitives.*;
 import renderer.*;
 import scene.Scene;
+import scene.Scene.SUPERSAMPLING_LEVEL;
 
 /**
  * Tests for reflection and transparency functionality, test for partial shadows
@@ -19,7 +20,7 @@ import scene.Scene;
  * @author dzilb
  */
 public class ReflectionRefractionTests {
-	private Scene scene = new Scene("Test scene").setSupersamplingEnabled(false);
+	private Scene scene = new Scene("Test scene").setSupersamplingLevel(SUPERSAMPLING_LEVEL.NONE);
 
 	/**
 	 * Produce a picture of a sphere lighted by a spot light

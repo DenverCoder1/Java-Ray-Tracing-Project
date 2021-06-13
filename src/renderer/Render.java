@@ -6,6 +6,7 @@ import primitives.Point3D;
 import primitives.Ray;
 import primitives.Vector;
 import scene.Scene;
+import scene.Scene.SUPERSAMPLING_LEVEL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,8 +99,18 @@ public class Render {
         for (int col = 0; col < nX; col++) {
           Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
           Color pixelColor = Color.BLACK;
+          // adaptive supersampling is enabled
+          if (scene.supersamplingLevel == SUPERSAMPLING_LEVEL.ADAPTIVE) {
+            List<Ray> supersamplingRays = getAdaptiveSupersamplingRays(ray, scene.supersamplingGridSize);
+            // add the intersected colors together
+            for (Ray r : supersamplingRays) {
+              pixelColor = pixelColor.add(rayTracer.traceRay(r));
+            }
+            // divide by the number of rays
+            pixelColor = pixelColor.reduce(supersamplingRays.size());
+          }
           // supersampling is enabled
-          if (scene.supersamplingEnabled) {
+          else if (scene.supersamplingLevel == SUPERSAMPLING_LEVEL.SUPERSAMPLING) {
             List<Ray> supersamplingRays = getSupersamplingRays(ray, scene.supersamplingGridSize);
             // add the intersected colors together
             for (Ray r : supersamplingRays) {
@@ -118,6 +129,10 @@ public class Render {
     } catch (MissingResourceException e) {
       throw new UnsupportedOperationException("Missing " + e.getClassName());
     }
+  }
+
+  private List<Ray> getAdaptiveSupersamplingRays(Ray ray, int supersamplingGridSize) {
+    return null;
   }
 
   /**

@@ -20,6 +20,13 @@ import primitives.Color;
 public class Scene {
 
   /**
+   * Choices for the supersampling level
+   */
+  public enum SUPERSAMPLING_LEVEL {
+    NONE, SUPERSAMPLING, ADAPTIVE
+  }
+
+  /**
    * the name of the scene
    */
   private String name;
@@ -52,17 +59,12 @@ public class Scene {
   /**
    * whether or not supersampling is enabled
    */
-  public boolean supersamplingEnabled;
+  public SUPERSAMPLING_LEVEL supersamplingLevel;
 
   /**
    * number of rows and columns for supersampling
    */
   public int supersamplingGridSize;
-
-  /**
-   * whether or not adaptive supersampling is enabled
-   */
-  public boolean adaptiveSupersamplingEnabled;
 
   /**
    * construct scene with defaults
@@ -75,9 +77,8 @@ public class Scene {
     ambientLight = new AmbientLight(Color.BLACK, 0);
     geometries = new Geometries();
     lights = new LinkedList<>();
-    supersamplingEnabled = true;
+    supersamplingLevel = SUPERSAMPLING_LEVEL.ADAPTIVE;
     supersamplingGridSize = 9;
-    adaptiveSupersamplingEnabled = true;
   }
 
   /**
@@ -151,13 +152,13 @@ public class Scene {
   }
 
   /**
-   * set supersampling on or off
+   * set supersampling to NONE, SUPERSAMPLING, or ADAPTIVE
    * 
-   * @param enabled whether or not to enable
+   * @param level supersampling level
    * @return scene object
    */
-  public Scene setSupersamplingEnabled(boolean enabled) {
-    this.supersamplingEnabled = enabled;
+  public Scene setSupersamplingLevel(SUPERSAMPLING_LEVEL level) {
+    this.supersamplingLevel = level;
     return this;
   }
 
@@ -169,17 +170,6 @@ public class Scene {
    */
   public Scene setSupersamplingGridSize(int gridSize) {
     this.supersamplingGridSize = gridSize;
-    return this;
-  }
-
-  /**
-   * set adaptive supersampling on or off
-   * 
-   * @param enabled whether or not to enable
-   * @return scene object
-   */
-  public Scene setAdaptiveSupersamplingEnabled(boolean enabled) {
-    this.adaptiveSupersamplingEnabled = enabled;
     return this;
   }
 }

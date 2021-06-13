@@ -7,6 +7,7 @@ import geometries.*;
 import primitives.*;
 import renderer.*;
 import scene.Scene;
+import scene.Scene.SUPERSAMPLING_LEVEL;
 
 /**
  * Test rendering a basic image
@@ -108,7 +109,7 @@ public class RenderTests {
 	 */
 	@Test
 	public void twoSpheres() {
-		Scene scene = new Scene("Test scene").setSupersamplingEnabled(true);
+		Scene scene = new Scene("Test scene").setSupersamplingLevel(SUPERSAMPLING_LEVEL.SUPERSAMPLING);
 		Camera camera1 = new Camera(new Point3D(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
 				.setViewPlaneSize(150, 150).setDistance(1000);
 
