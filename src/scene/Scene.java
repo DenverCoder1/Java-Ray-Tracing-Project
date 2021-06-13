@@ -156,7 +156,7 @@ public class Scene {
    * @param enabled whether or not to enable
    * @return scene object
    */
-  public Scene setSupersampling(boolean enabled) {
+  public Scene setSupersamplingEnabled(boolean enabled) {
     this.supersamplingEnabled = enabled;
     return this;
   }
@@ -178,7 +178,7 @@ public class Scene {
    * @param enabled whether or not to enable
    * @return scene object
    */
-  public Scene setAdaptiveSupersampling(boolean enabled) {
+  public Scene setAdaptiveSupersamplingEnabled(boolean enabled) {
     this.adaptiveSupersamplingEnabled = enabled;
     return this;
   }

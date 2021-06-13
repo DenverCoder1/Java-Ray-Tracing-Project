@@ -96,6 +96,15 @@ public class Camera {
     }
 
     /**
+     * getter for distance
+     * 
+     * @return distance
+     */
+    public double getDistance() {
+        return distance;
+    }
+
+    /**
      * Set view plane size
      *
      * @param width

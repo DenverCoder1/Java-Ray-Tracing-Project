@@ -130,7 +130,7 @@ public class Render {
   private List<Ray> getSupersamplingRays(Ray ray, int gridSize) {
     Scene scene = rayTracer.scene;
     Camera camera = scene.getCamera();
-    Point3D pixel = ray.getOrigin();
+    Point3D pixel = ray.getPoint(camera.getDistance());
     double pixelHeight = camera.getHeight() / imageWriter.getNy();
     double pixelWidth = camera.getWidth() / imageWriter.getNx();
     Vector vRight = scene.getCamera().getVRight();
@@ -143,8 +143,13 @@ public class Render {
     // create grid of points for supersampling
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
-        Point3D newPixel = pixel.add(vUp.scale(row * (pixelHeight / (gridSize - 1))))
-            .add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
+        Point3D newPixel = pixel;
+        if (row > 0) {
+          newPixel = newPixel.add(vUp.scale(row * (pixelHeight / (gridSize - 1))));
+        }
+        if (col > 0) {
+          newPixel = newPixel.add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
+        }
         supersamplingRays.add(new Ray(newPixel, newPixel.subtract(cameraOrigin)));
       }
     }
