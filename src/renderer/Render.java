@@ -43,7 +43,7 @@ public class Render {
   /**
    * maximum recursion level for adaptive supersampling
    */
-  public int adaptiveMaxRecursionLevel = 10;
+  public int adaptiveMaxRecursionLevel = 2;
 
   /**
    * image writer
@@ -175,7 +175,42 @@ public class Render {
    */
   private Color adaptiveSupersamplingRecursive(Point3D pc, double cellWidth, double cellHeight, Point3D cameraOrigin,
       Vector vRight, Vector vUp, int level) {
-    return Color.BLACK;
+    // find points of the four corners
+    Point3D topLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(cellHeight / 2));
+    Point3D topRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(cellHeight / 2));
+    Point3D bottomRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
+    Point3D bottomLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
+
+    // calculate the colors of the new rays from the camera to the corners
+    Color topLeftColor = rayTracer.traceRay(new Ray(cameraOrigin, topLeft.subtract(cameraOrigin)));
+    Color topRightColor = rayTracer.traceRay(new Ray(cameraOrigin, topRight.subtract(cameraOrigin)));
+    Color bottomRightColor = rayTracer.traceRay(new Ray(cameraOrigin, bottomRight.subtract(cameraOrigin)));
+    Color bottomLeftColor = rayTracer.traceRay(new Ray(cameraOrigin, bottomLeft.subtract(cameraOrigin)));
+
+    // stop when maximum recursion level is reached or colors are the same
+    if (level < 1 || topLeftColor.equals(topRightColor) && topLeftColor.equals(bottomLeftColor)
+        && topLeftColor.equals(bottomRightColor)) {
+      // return average of the corner colors
+      return topLeftColor.add(topRightColor, bottomLeftColor, bottomRightColor).reduce(4);
+    }
+
+    // calculate the centers of each quarter of the cell
+    Point3D topLeftPC = pc.add(vRight.scale(-cellWidth / 4)).add(vUp.scale(cellHeight / 4));
+    Point3D topRightPC = pc.add(vRight.scale(cellWidth / 4)).add(vUp.scale(cellHeight / 4));
+    Point3D bottomLeftPC = pc.add(vRight.scale(cellWidth / 4)).add(vUp.scale(-cellHeight / 4));
+    Point3D bottomRightPC = pc.add(vRight.scale(-cellWidth / 4)).add(vUp.scale(-cellHeight / 4));
+
+    // divide cells
+    cellWidth /= 2;
+    cellHeight /= 2;
+
+    // calculate average colors of the four quarters
+    return Color.BLACK
+        .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
+            adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
+            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
+            adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1))
+        .reduce(4);
   }
 
   /**
