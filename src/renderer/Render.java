@@ -6,7 +6,6 @@ import primitives.Point3D;
 import primitives.Ray;
 import primitives.Vector;
 import scene.Scene;
-import scene.Scene.SUPERSAMPLING_LEVEL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,28 @@ import java.io.IOException;
  * @author Elad Harizy
  */
 public class Render {
+
+  /**
+   * Choices for the supersampling level
+   */
+  public enum SUPERSAMPLING_LEVEL {
+    NONE, SUPERSAMPLING, ADAPTIVE
+  }
+
+  /**
+   * whether or not supersampling is enabled
+   */
+  public SUPERSAMPLING_LEVEL supersamplingLevel = SUPERSAMPLING_LEVEL.ADAPTIVE;
+
+  /**
+   * number of rows and columns for supersampling
+   */
+  public int supersamplingGridSize = 9;
+
+  /**
+   * maximum recursion level for adaptive supersampling
+   */
+  public int adaptiveMaxRecursionLevel = 10;
 
   /**
    * image writer
@@ -98,26 +119,14 @@ public class Render {
       for (int row = 0; row < nY; row++) {
         for (int col = 0; col < nX; col++) {
           Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
-          Color pixelColor = Color.BLACK;
+          Color pixelColor;
           // adaptive supersampling is enabled
-          if (scene.supersamplingLevel == SUPERSAMPLING_LEVEL.ADAPTIVE) {
-            List<Ray> supersamplingRays = getAdaptiveSupersamplingRays(ray, scene.supersamplingGridSize);
-            // add the intersected colors together
-            for (Ray r : supersamplingRays) {
-              pixelColor = pixelColor.add(rayTracer.traceRay(r));
-            }
-            // divide by the number of rays
-            pixelColor = pixelColor.reduce(supersamplingRays.size());
+          if (supersamplingLevel == SUPERSAMPLING_LEVEL.ADAPTIVE) {
+            pixelColor = getAdaptiveSupersamplingColor(ray);
           }
           // supersampling is enabled
-          else if (scene.supersamplingLevel == SUPERSAMPLING_LEVEL.SUPERSAMPLING) {
-            List<Ray> supersamplingRays = getSupersamplingRays(ray, scene.supersamplingGridSize);
-            // add the intersected colors together
-            for (Ray r : supersamplingRays) {
-              pixelColor = pixelColor.add(rayTracer.traceRay(r));
-            }
-            // divide by the number of rays
-            pixelColor = pixelColor.reduce(supersamplingRays.size());
+          else if (supersamplingLevel == SUPERSAMPLING_LEVEL.SUPERSAMPLING) {
+            pixelColor = getSupersamplingColor(ray, supersamplingGridSize);
           }
           // no supersampling
           else {
@@ -131,23 +140,57 @@ public class Render {
     }
   }
 
-  private List<Ray> getAdaptiveSupersamplingRays(Ray ray, int supersamplingGridSize) {
-    return null;
+  /**
+   * Get the color for adaptive supersampling
+   * 
+   * @param ray ray for original pixel location
+   * @return supersampling average color
+   */
+  private Color getAdaptiveSupersamplingColor(Ray ray) {
+    Scene scene = rayTracer.scene;
+    Camera camera = scene.getCamera();
+    Point3D pc = ray.getPoint(camera.getDistance());
+    double pixelWidth = camera.getWidth() / imageWriter.getNx();
+    double pixelHeight = camera.getHeight() / imageWriter.getNy();
+    Vector vRight = scene.getCamera().getVRight();
+    Vector vUp = scene.getCamera().getVUp();
+    Point3D cameraOrigin = scene.getCamera().getOrigin();
+    return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, cameraOrigin, vRight, vUp,
+        adaptiveMaxRecursionLevel);
   }
 
   /**
-   * Get the rays for supersampling
+   *
+   * Recursive function to sample cell colors and recursively sample smaller cells
+   * when there is color variance
+   * 
+   * @param pc           center of the pixel
+   * @param cellWidth    width of cell that is being sampled
+   * @param cellHeight   height of cell that is being sampled
+   * @param cameraOrigin location of the camera
+   * @param vRight       camera vRight
+   * @param vUp          camera vUp
+   * @param level        recursion level - stops when reaches 1
+   * @return average color of the cell
+   */
+  private Color adaptiveSupersamplingRecursive(Point3D pc, double cellWidth, double cellHeight, Point3D cameraOrigin,
+      Vector vRight, Vector vUp, int level) {
+    return Color.BLACK;
+  }
+
+  /**
+   * Get the average color of rays for supersampling
    * 
    * @param ray      ray for original pixel location
    * @param gridSize number of rows and columns for dividing pixel
-   * @return supersampling rays
+   * @return supersampling average color
    */
-  private List<Ray> getSupersamplingRays(Ray ray, int gridSize) {
+  private Color getSupersamplingColor(Ray ray, int gridSize) {
     Scene scene = rayTracer.scene;
     Camera camera = scene.getCamera();
     Point3D pixel = ray.getPoint(camera.getDistance());
-    double pixelHeight = camera.getHeight() / imageWriter.getNy();
     double pixelWidth = camera.getWidth() / imageWriter.getNx();
+    double pixelHeight = camera.getHeight() / imageWriter.getNy();
     Vector vRight = scene.getCamera().getVRight();
     Vector vUp = scene.getCamera().getVUp();
     Point3D cameraOrigin = scene.getCamera().getOrigin();
@@ -155,7 +198,7 @@ public class Render {
     List<Ray> supersamplingRays = new ArrayList<>();
     pixel = pixel.add(vRight.scale(-pixelWidth / 2));
     pixel = pixel.add(vUp.scale(-pixelHeight / 2));
-    // create grid of points for supersampling
+    // create grid of rays for supersampling
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
         Point3D newPixel = pixel;
@@ -168,7 +211,13 @@ public class Render {
         supersamplingRays.add(new Ray(newPixel, newPixel.subtract(cameraOrigin)));
       }
     }
-    return supersamplingRays;
+    // add the intersected colors together
+    Color pixelColor = Color.BLACK;
+    for (Ray r : supersamplingRays) {
+      pixelColor = pixelColor.add(rayTracer.traceRay(r));
+    }
+    // divide by the number of rays
+    return pixelColor.reduce(supersamplingRays.size());
   }
 
   /**
@@ -215,6 +264,39 @@ public class Render {
    */
   public Render setRayTracer(RayTracerBase rayTracerBasic) {
     this.rayTracer = rayTracerBasic;
+    return this;
+  }
+
+  /**
+   * set supersampling to NONE, SUPERSAMPLING, or ADAPTIVE
+   * 
+   * @param level supersampling level
+   * @return Render object
+   */
+  public Render setSupersamplingLevel(SUPERSAMPLING_LEVEL level) {
+    this.supersamplingLevel = level;
+    return this;
+  }
+
+  /**
+   * set supersampling grid size
+   * 
+   * @param gridSize number of rows/cols
+   * @return Render object
+   */
+  public Render setSupersamplingGridSize(int gridSize) {
+    this.supersamplingGridSize = gridSize;
+    return this;
+  }
+
+  /**
+   * set adaptive supersampling max recursion level
+   * 
+   * @param maxLevel maximum level of recursion
+   * @return Render object
+   */
+  public Render setAdaptiveMaxRecursionLevel(int maxLevel) {
+    this.adaptiveMaxRecursionLevel = maxLevel;
     return this;
   }
 
