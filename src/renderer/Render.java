@@ -154,9 +154,7 @@ public class Render {
     double pixelHeight = camera.getHeight() / imageWriter.getNy();
     Vector vRight = scene.getCamera().getVRight();
     Vector vUp = scene.getCamera().getVUp();
-    Point3D cameraOrigin = scene.getCamera().getOrigin();
-    return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, cameraOrigin, vRight, vUp,
-        adaptiveMaxRecursionLevel);
+    return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, camera, vRight, vUp, adaptiveMaxRecursionLevel);
   }
 
   /**
@@ -173,7 +171,7 @@ public class Render {
    * @param level        recursion level - stops when reaches 1
    * @return average color of the cell
    */
-  private Color adaptiveSupersamplingRecursive(Point3D pc, double cellWidth, double cellHeight, Point3D cameraOrigin,
+  private Color adaptiveSupersamplingRecursive(Point3D pc, double cellWidth, double cellHeight, Camera camera,
       Vector vRight, Vector vUp, int level) {
     // find points of the four corners
     Point3D topLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(cellHeight / 2));
@@ -182,16 +180,21 @@ public class Render {
     Point3D bottomLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
 
     // calculate the colors of the new rays from the camera to the corners
-    Color topLeftColor = rayTracer.traceRay(new Ray(cameraOrigin, topLeft.subtract(cameraOrigin)));
-    Color topRightColor = rayTracer.traceRay(new Ray(cameraOrigin, topRight.subtract(cameraOrigin)));
-    Color bottomRightColor = rayTracer.traceRay(new Ray(cameraOrigin, bottomRight.subtract(cameraOrigin)));
-    Color bottomLeftColor = rayTracer.traceRay(new Ray(cameraOrigin, bottomLeft.subtract(cameraOrigin)));
+    Color topLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(topLeft));
+    Color topRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(topRight));
+    Color bottomRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomRight));
+    Color bottomLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomLeft));
 
-    // stop when maximum recursion level is reached or colors are the same
-    if (level <= 1 || topLeftColor.equals(topRightColor) && topLeftColor.equals(bottomLeftColor)
-        && topLeftColor.equals(bottomRightColor)) {
+    // stop when maximum recursion level
+    if (level <= 1) {
       // return average of the corner colors
       return topLeftColor.add(topRightColor, bottomLeftColor, bottomRightColor).reduce(4);
+    }
+
+    // if all corners are the same color, return any corner color
+    if (topLeftColor.equals(topRightColor) && topLeftColor.equals(bottomLeftColor)
+        && topLeftColor.equals(bottomRightColor)) {
+      return topLeftColor;
     }
 
     // calculate the centers of each quarter of the cell
@@ -205,11 +208,10 @@ public class Render {
     cellHeight /= 2;
 
     // calculate average colors of the four quarters
-    return Color.BLACK
+    return adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1)
         .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
             adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
-            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
-            adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1))
+            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1))
         .reduce(4);
   }
 
@@ -236,14 +238,14 @@ public class Render {
     // create grid of rays for supersampling
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
-        Point3D newPixel = pixel;
+        Point3D newPoint = pixel;
         if (row > 0) {
-          newPixel = newPixel.add(vUp.scale(row * (pixelHeight / (gridSize - 1))));
+          newPoint = newPoint.add(vUp.scale(row * (pixelHeight / (gridSize - 1))));
         }
         if (col > 0) {
-          newPixel = newPixel.add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
+          newPoint = newPoint.add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
         }
-        supersamplingRays.add(new Ray(newPixel, newPixel.subtract(cameraOrigin)));
+        supersamplingRays.add(camera.constructRayThroughPoint(newPoint));
       }
     }
     // add the intersected colors together

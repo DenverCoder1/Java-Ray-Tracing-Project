@@ -155,4 +155,15 @@ public class Camera {
         return new Ray(origin, vij);
     }
 
+    /**
+     * Gets parameters that define the view plane matrix, and the index of the pixel
+     * on it, and returns a ray from the place point of the camera through the pixel
+     * 
+     * @param point point to construct ray through
+     * @return Ray from the camera through the point
+     */
+    public Ray constructRayThroughPoint(Point3D point) {
+        return new Ray(origin, point.subtract(origin));
+    }
+
 }
