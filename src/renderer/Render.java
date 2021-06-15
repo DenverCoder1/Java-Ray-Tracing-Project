@@ -231,8 +231,8 @@ public class Render {
     Point3D cameraOrigin = scene.getCamera().getOrigin();
     // list for returning rays
     List<Ray> supersamplingRays = new ArrayList<>();
-    pixel = pixel.add(vRight.scale(-pixelWidth / 2));
-    pixel = pixel.add(vUp.scale(-pixelHeight / 2));
+    // get top left of pixel
+    pixel = pixel.add(vRight.scale(-pixelWidth / 2)).add(vUp.scale(-pixelHeight / 2));
     // create grid of rays for supersampling
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
