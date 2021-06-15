@@ -7,8 +7,9 @@ import primitives.Ray;
 import primitives.Vector;
 import scene.Scene;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.MissingResourceException;
 
 import java.awt.Desktop;
@@ -43,7 +44,7 @@ public class Render {
   /**
    * maximum recursion level for adaptive supersampling
    */
-  public int adaptiveMaxRecursionLevel = 2;
+  public int adaptiveMaxRecursionLevel = 3;
 
   /**
    * image writer
@@ -152,9 +153,8 @@ public class Render {
     Point3D pc = ray.getPoint(camera.getDistance());
     double pixelWidth = camera.getWidth() / imageWriter.getNx();
     double pixelHeight = camera.getHeight() / imageWriter.getNy();
-    Vector vRight = scene.getCamera().getVRight();
-    Vector vUp = scene.getCamera().getVUp();
-    return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, camera, vRight, vUp, adaptiveMaxRecursionLevel);
+    Map<Point3D, Color> memo = new HashMap<>();
+    return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, camera, memo, adaptiveMaxRecursionLevel);
   }
 
   /**
@@ -166,24 +166,46 @@ public class Render {
    * @param cellWidth    width of cell that is being sampled
    * @param cellHeight   height of cell that is being sampled
    * @param cameraOrigin location of the camera
-   * @param vRight       camera vRight
-   * @param vUp          camera vUp
+   * @param memo         hash map of previously computed ray colors
    * @param level        recursion level - stops when reaches 1
    * @return average color of the cell
    */
   private Color adaptiveSupersamplingRecursive(Point3D pc, double cellWidth, double cellHeight, Camera camera,
-      Vector vRight, Vector vUp, int level) {
+      Map<Point3D, Color> memo, int level) {
+    Vector vRight = camera.getVRight();
+    Vector vUp = camera.getVUp();
     // find points of the four corners
     Point3D topLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(cellHeight / 2));
     Point3D topRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(cellHeight / 2));
-    Point3D bottomRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
     Point3D bottomLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
+    Point3D bottomRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
 
     // calculate the colors of the new rays from the camera to the corners
-    Color topLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(topLeft));
-    Color topRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(topRight));
-    Color bottomRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomRight));
-    Color bottomLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomLeft));
+    Color topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
+    if (memo.containsKey(topLeft)) {
+      topLeftColor = memo.get(topLeft);
+    } else {
+      topLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(topLeft));
+      memo.put(topLeft, topLeftColor);
+    }
+    if (memo.containsKey(topRight)) {
+      topRightColor = memo.get(topRight);
+    } else {
+      topRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(topRight));
+      memo.put(topRight, topRightColor);
+    }
+    if (memo.containsKey(bottomLeft)) {
+      bottomLeftColor = memo.get(bottomLeft);
+    } else {
+      bottomLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomLeft));
+      memo.put(bottomLeft, bottomLeftColor);
+    }
+    if (memo.containsKey(bottomRight)) {
+      bottomRightColor = memo.get(bottomRight);
+    } else {
+      bottomRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomRight));
+      memo.put(bottomRight, bottomRightColor);
+    }
 
     // stop when maximum recursion level
     if (level <= 1) {
@@ -208,10 +230,10 @@ public class Render {
     cellHeight /= 2;
 
     // calculate average colors of the four quarters
-    return adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1)
-        .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1),
-            adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1),
-            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1))
+    return adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, camera, memo, level - 1)
+        .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, camera, memo, level - 1),
+            adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, camera, memo, level - 1),
+            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, camera, memo, level - 1))
         .reduce(4);
   }
 

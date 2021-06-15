@@ -193,9 +193,9 @@ public class RenderTests {
 		scene.setCamera(camera1);
 
 		Render render = new Render() //
-				.setImageWriter(new ImageWriter("refractionTwoSpheresSupersampling", 500, 500)) //
+				.setImageWriter(new ImageWriter("refractionTwoSpheresAdaptiveSupersampling", 500, 500)) //
 				.setRayTracer(new BasicRayTracer(scene)) //
-				.setSupersamplingType(SUPERSAMPLING_TYPE.SUPERSAMPLING);
+				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE);
 		render.renderImage();
 		render.writeToImage();
 	}
