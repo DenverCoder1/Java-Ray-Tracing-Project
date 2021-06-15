@@ -24,16 +24,16 @@ import java.io.IOException;
 public class Render {
 
   /**
-   * Choices for the supersampling level
+   * Choices for the supersampling type
    */
-  public enum SUPERSAMPLING_LEVEL {
+  public enum SUPERSAMPLING_TYPE {
     NONE, SUPERSAMPLING, ADAPTIVE
   }
 
   /**
    * whether or not supersampling is enabled
    */
-  public SUPERSAMPLING_LEVEL supersamplingLevel = SUPERSAMPLING_LEVEL.ADAPTIVE;
+  public SUPERSAMPLING_TYPE supersamplingType = SUPERSAMPLING_TYPE.ADAPTIVE;
 
   /**
    * number of rows and columns for supersampling
@@ -121,11 +121,11 @@ public class Render {
           Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
           Color pixelColor;
           // adaptive supersampling is enabled
-          if (supersamplingLevel == SUPERSAMPLING_LEVEL.ADAPTIVE) {
+          if (supersamplingType == SUPERSAMPLING_TYPE.ADAPTIVE) {
             pixelColor = getAdaptiveSupersamplingColor(ray);
           }
           // supersampling is enabled
-          else if (supersamplingLevel == SUPERSAMPLING_LEVEL.SUPERSAMPLING) {
+          else if (supersamplingType == SUPERSAMPLING_TYPE.SUPERSAMPLING) {
             pixelColor = getSupersamplingColor(ray, supersamplingGridSize);
           }
           // no supersampling
@@ -188,7 +188,7 @@ public class Render {
     Color bottomLeftColor = rayTracer.traceRay(new Ray(cameraOrigin, bottomLeft.subtract(cameraOrigin)));
 
     // stop when maximum recursion level is reached or colors are the same
-    if (level < 1 || topLeftColor.equals(topRightColor) && topLeftColor.equals(bottomLeftColor)
+    if (level <= 1 || topLeftColor.equals(topRightColor) && topLeftColor.equals(bottomLeftColor)
         && topLeftColor.equals(bottomRightColor)) {
       // return average of the corner colors
       return topLeftColor.add(topRightColor, bottomLeftColor, bottomRightColor).reduce(4);
@@ -305,11 +305,11 @@ public class Render {
   /**
    * set supersampling to NONE, SUPERSAMPLING, or ADAPTIVE
    * 
-   * @param level supersampling level
+   * @param type supersampling type
    * @return Render object
    */
-  public Render setSupersamplingLevel(SUPERSAMPLING_LEVEL level) {
-    this.supersamplingLevel = level;
+  public Render setSupersamplingType(SUPERSAMPLING_TYPE type) {
+    this.supersamplingType = type;
     return this;
   }
 
