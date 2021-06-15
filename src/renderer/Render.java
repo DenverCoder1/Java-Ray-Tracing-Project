@@ -208,46 +208,27 @@ public class Render {
     cellHeight /= 2;
 
     // calculate average colors of the four quarters
-    return adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1)
-        .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
-            adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1),
-            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, cameraOrigin, vRight, vUp, level - 1))
+    return adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1)
+        .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1),
+            adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1),
+            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, camera, vRight, vUp, level - 1))
         .reduce(4);
   }
 
   /**
    * Get the average color of rays for supersampling
    * 
-   * @param ray      ray for original pixel location
-   * @param gridSize number of rows and columns for dividing pixel
+   * @param middleRay ray for original pixel location
+   * @param gridSize  number of rows and columns for dividing pixel
    * @return supersampling average color
    */
-  private Color getSupersamplingColor(Ray ray, int gridSize) {
+  private Color getSupersamplingColor(Ray middleRay, int gridSize) {
     Scene scene = rayTracer.scene;
     Camera camera = scene.getCamera();
-    Point3D pixel = ray.getPoint(camera.getDistance());
-    double pixelWidth = camera.getWidth() / imageWriter.getNx();
-    double pixelHeight = camera.getHeight() / imageWriter.getNy();
-    Vector vRight = scene.getCamera().getVRight();
-    Vector vUp = scene.getCamera().getVUp();
-    Point3D cameraOrigin = scene.getCamera().getOrigin();
+    int nX = imageWriter.getNx();
+    int nY = imageWriter.getNy();
     // list for returning rays
-    List<Ray> supersamplingRays = new ArrayList<>();
-    // get top left of pixel
-    pixel = pixel.add(vRight.scale(-pixelWidth / 2)).add(vUp.scale(-pixelHeight / 2));
-    // create grid of rays for supersampling
-    for (int row = 0; row < gridSize; row++) {
-      for (int col = 0; col < gridSize; col++) {
-        Point3D newPoint = pixel;
-        if (row > 0) {
-          newPoint = newPoint.add(vUp.scale(row * (pixelHeight / (gridSize - 1))));
-        }
-        if (col > 0) {
-          newPoint = newPoint.add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
-        }
-        supersamplingRays.add(camera.constructRayThroughPoint(newPoint));
-      }
-    }
+    List<Ray> supersamplingRays = camera.getSupersamplingRays(middleRay, gridSize, nX, nY);
     // add the intersected colors together
     Color pixelColor = Color.BLACK;
     for (Ray r : supersamplingRays) {

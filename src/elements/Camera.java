@@ -6,6 +6,9 @@ import primitives.Vector;
 
 import static primitives.Util.isZero;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * class Camera has place of the camera, were all the rays starts
  * 
@@ -164,6 +167,38 @@ public class Camera {
      */
     public Ray constructRayThroughPoint(Point3D point) {
         return new Ray(origin, point.subtract(origin));
+    }
+
+    /**
+     * construct an equidistant grid of rays through a pixel
+     * 
+     * @param middleRay ray for original pixel location
+     * @param gridSize  number of rows and columns for dividing pixel
+     * @param nX        number of pixels in width
+     * @param nY        number of pixels in height
+     * @return
+     */
+    public List<Ray> getSupersamplingRays(Ray middleRay, int gridSize, double nX, double nY) {
+        double pixelWidth = width / nX;
+        double pixelHeight = height / nY;
+        Point3D pixel = middleRay.getPoint(distance);
+        List<Ray> supersamplingRays = new ArrayList<>();
+        // get top left of pixel
+        pixel = pixel.add(vRight.scale(-pixelWidth / 2)).add(vUp.scale(-pixelHeight / 2));
+        // create grid of rays for supersampling
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
+                Point3D newPoint = pixel;
+                if (row > 0) {
+                    newPoint = newPoint.add(vUp.scale(row * (pixelHeight / (gridSize - 1))));
+                }
+                if (col > 0) {
+                    newPoint = newPoint.add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
+                }
+                supersamplingRays.add(constructRayThroughPoint(newPoint));
+            }
+        }
+        return supersamplingRays;
     }
 
 }
