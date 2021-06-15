@@ -78,6 +78,33 @@ public class Camera {
     }
 
     /**
+     * getter for height
+     * 
+     * @return height
+     */
+    public double getHeight() {
+        return height;
+    }
+
+    /**
+     * getter for width
+     * 
+     * @return width
+     */
+    public double getWidth() {
+        return width;
+    }
+
+    /**
+     * getter for distance
+     * 
+     * @return distance
+     */
+    public double getDistance() {
+        return distance;
+    }
+
+    /**
      * Set view plane size
      *
      * @param width
@@ -126,6 +153,17 @@ public class Camera {
 
         Vector vij = pij.subtract(origin).normalize();
         return new Ray(origin, vij);
+    }
+
+    /**
+     * Gets parameters that define the view plane matrix, and the index of the pixel
+     * on it, and returns a ray from the place point of the camera through the pixel
+     * 
+     * @param point point to construct ray through
+     * @return Ray from the camera through the point
+     */
+    public Ray constructRayThroughPoint(Point3D point) {
+        return new Ray(origin, point.subtract(origin));
     }
 
 }

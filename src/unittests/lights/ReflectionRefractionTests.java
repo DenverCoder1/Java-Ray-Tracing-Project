@@ -11,6 +11,7 @@ import geometries.Sphere;
 import geometries.Triangle;
 import primitives.*;
 import renderer.*;
+import renderer.Render.SUPERSAMPLING_TYPE;
 import scene.Scene;
 
 /**
@@ -44,7 +45,8 @@ public class ReflectionRefractionTests {
 
 		Render render = new Render() //
 				.setImageWriter(new ImageWriter("refractionTwoSpheres", 500, 500)) //
-				.setRayTracer(new BasicRayTracer(scene));
+				.setRayTracer(new BasicRayTracer(scene)) //
+				.setSupersamplingType(SUPERSAMPLING_TYPE.NONE);
 		render.renderImage();
 		render.writeToImage();
 	}
