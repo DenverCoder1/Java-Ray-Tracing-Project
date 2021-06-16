@@ -282,6 +282,8 @@ public class Render {
     if (rayTracer.scene.getCamera() == null)
       throw new MissingResourceException(RESOURCE_ERROR, RENDER_CLASS, CAMERA_COMPONENT);
 
+    long startTime = System.currentTimeMillis();
+
     final int nX = imageWriter.getNx();
     final int nY = imageWriter.getNy();
     if (threadsCount == 0)
@@ -290,6 +292,9 @@ public class Render {
           castRay(nX, nY, j, i);
     else
       renderImageThreaded();
+
+    long endTime = System.currentTimeMillis();
+    System.out.println((endTime - startTime) / 1000.0 + " seconds");
   }
 
   /**
