@@ -205,48 +205,38 @@ public class Render {
     double halfCellHeight = cellHeight / 2;
 
     // find points of the four corners
-    Point3D topLeft = pc.add(vRight.scale(-halfCellWidth)).add(vUp.scale(halfCellHeight));
-    Point3D topRight = topLeft.add(vRight.scale(cellWidth));
-    Point3D bottomLeft = topLeft.add(vUp.scale(-cellWidth));
-    Point3D bottomRight = topRight.add(vUp.scale(-cellWidth));
+    Point3D[] corners = new Point3D[4];
+    corners[0] = pc.add(vRight.scale(-halfCellWidth)).add(vUp.scale(halfCellHeight)); // top left
+    corners[1] = corners[0].add(vRight.scale(cellWidth)); // top right
+    corners[2] = corners[0].add(vUp.scale(-cellWidth)); // bottom left
+    corners[3] = corners[1].add(vUp.scale(-cellWidth)); // bottom right
 
-    // calculate the colors of the new rays from the camera to the corners
-    Color topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
-    if (memo.containsKey(topLeft)) {
-      topLeftColor = memo.get(topLeft);
-    } else {
-      topLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(topLeft));
-      memo.put(topLeft, topLeftColor);
-    }
-    if (memo.containsKey(topRight)) {
-      topRightColor = memo.get(topRight);
-    } else {
-      topRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(topRight));
-      memo.put(topRight, topRightColor);
-    }
-    if (memo.containsKey(bottomLeft)) {
-      bottomLeftColor = memo.get(bottomLeft);
-    } else {
-      bottomLeftColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomLeft));
-      memo.put(bottomLeft, bottomLeftColor);
-    }
-    if (memo.containsKey(bottomRight)) {
-      bottomRightColor = memo.get(bottomRight);
-    } else {
-      bottomRightColor = rayTracer.traceRay(camera.constructRayThroughPoint(bottomRight));
-      memo.put(bottomRight, bottomRightColor);
+    // get colors of each point
+    Color[] cornerColors = new Color[4];
+    for (int i = 0; i < corners.length; i++) {
+      Point3D point = corners[i];
+      // get from hash map if already computed
+      if (memo.containsKey(point)) {
+        cornerColors[i] = memo.get(point);
+      }
+      // trace ray and store color in hash map
+      else {
+        Color pointColor = rayTracer.traceRay(camera.constructRayThroughPoint(point));
+        cornerColors[i] = pointColor;
+        memo.put(point, pointColor);
+      }
     }
 
     // stop when maximum recursion level
     if (level <= 1) {
       // return average of the corner colors
-      return topLeftColor.add(topRightColor, bottomLeftColor, bottomRightColor).reduce(4);
+      return cornerColors[0].add(cornerColors[1], cornerColors[2], cornerColors[3]).reduce(4);
     }
 
     // if all corners are the same color, return any corner color
-    if (topLeftColor.equals(topRightColor) && topLeftColor.equals(bottomLeftColor)
-        && topLeftColor.equals(bottomRightColor)) {
-      return topLeftColor;
+    if (cornerColors[0].equals(cornerColors[1]) && cornerColors[0].equals(cornerColors[2])
+        && cornerColors[0].equals(cornerColors[3])) {
+      return cornerColors[0];
     }
 
     // calculate the centers of each quarter of the cell
