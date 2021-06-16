@@ -7,11 +7,15 @@ import primitives.Ray;
 import primitives.Vector;
 import scene.Scene;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -97,6 +101,8 @@ public class Render {
    * Renders image to imageWriter buffer and checks that objects exist first
    * 
    * @throws UnsupportedOperationException if any objects are missing
+   * @throws InterruptedException
+   * @throws ExecutionException
    */
   public void renderImage() {
     try {
@@ -117,25 +123,40 @@ public class Render {
       // rendering the image
       int nX = imageWriter.getNx();
       int nY = imageWriter.getNy();
-      for (int row = 0; row < nY; row++) {
-        for (int col = 0; col < nX; col++) {
-          Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
-          Color pixelColor;
-          // adaptive supersampling is enabled
-          if (supersamplingType == SUPERSAMPLING_TYPE.ADAPTIVE) {
-            pixelColor = getAdaptiveSupersamplingColor(ray);
-          }
-          // supersampling is enabled
-          else if (supersamplingType == SUPERSAMPLING_TYPE.SUPERSAMPLING) {
-            pixelColor = getSupersamplingColor(ray, supersamplingGridSize);
-          }
-          // no supersampling
-          else {
-            pixelColor = rayTracer.traceRay(ray);
-          }
-          imageWriter.writePixel(col, row, pixelColor);
+      // create thread pool
+      ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+      List<Callable<Void>> tasks = new ArrayList<>();
+      for (int i = 0; i < nY; i++) {
+        for (int j = 0; j < nX; j++) {
+          final int row = i;
+          final int col = j;
+          tasks.add(() -> {
+            Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
+            Color pixelColor;
+            // adaptive supersampling is enabled
+            if (supersamplingType == SUPERSAMPLING_TYPE.ADAPTIVE) {
+              pixelColor = getAdaptiveSupersamplingColor(ray);
+            }
+            // supersampling is enabled
+            else if (supersamplingType == SUPERSAMPLING_TYPE.SUPERSAMPLING) {
+              pixelColor = getSupersamplingColor(ray, supersamplingGridSize);
+            }
+            // no supersampling
+            else {
+              pixelColor = rayTracer.traceRay(ray);
+            }
+            imageWriter.writePixel(col, row, pixelColor);
+            return null;
+          });
         }
       }
+      long startTime = System.currentTimeMillis();
+      exec.invokeAll(tasks);
+      long endTime = System.currentTimeMillis();
+      System.out.println((endTime - startTime) / 1000.0 + " seconds");
+      exec.shutdown();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     } catch (MissingResourceException e) {
       throw new UnsupportedOperationException("Missing " + e.getClassName());
     }
@@ -174,11 +195,15 @@ public class Render {
       Map<Point3D, Color> memo, int level) {
     Vector vRight = camera.getVRight();
     Vector vUp = camera.getVUp();
+
+    double halfCellWidth = cellWidth / 2;
+    double halfCellHeight = cellHeight / 2;
+
     // find points of the four corners
-    Point3D topLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(cellHeight / 2));
-    Point3D topRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(cellHeight / 2));
-    Point3D bottomLeft = pc.add(vRight.scale(-cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
-    Point3D bottomRight = pc.add(vRight.scale(cellWidth / 2)).add(vUp.scale(-cellHeight / 2));
+    Point3D topLeft = pc.add(vRight.scale(-halfCellWidth)).add(vUp.scale(halfCellHeight));
+    Point3D topRight = topLeft.add(vRight.scale(cellWidth));
+    Point3D bottomLeft = topLeft.add(vUp.scale(-cellWidth));
+    Point3D bottomRight = topRight.add(vUp.scale(-cellWidth));
 
     // calculate the colors of the new rays from the camera to the corners
     Color topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
@@ -220,20 +245,16 @@ public class Render {
     }
 
     // calculate the centers of each quarter of the cell
-    Point3D topLeftPC = pc.add(vRight.scale(-cellWidth / 4)).add(vUp.scale(cellHeight / 4));
-    Point3D topRightPC = pc.add(vRight.scale(cellWidth / 4)).add(vUp.scale(cellHeight / 4));
-    Point3D bottomLeftPC = pc.add(vRight.scale(cellWidth / 4)).add(vUp.scale(-cellHeight / 4));
-    Point3D bottomRightPC = pc.add(vRight.scale(-cellWidth / 4)).add(vUp.scale(-cellHeight / 4));
-
-    // divide cells
-    cellWidth /= 2;
-    cellHeight /= 2;
+    Point3D topLeftPC = pc.add(vRight.scale(-halfCellWidth / 2)).add(vUp.scale(halfCellWidth / 2));
+    Point3D topRightPC = topLeftPC.add(vRight.scale(halfCellWidth));
+    Point3D bottomLeftPC = topLeftPC.add(vUp.scale(-halfCellWidth));
+    Point3D bottomRightPC = topRightPC.add(vUp.scale(-halfCellWidth));
 
     // calculate average colors of the four quarters
-    return adaptiveSupersamplingRecursive(topLeftPC, cellWidth, cellHeight, camera, memo, level - 1)
-        .add(adaptiveSupersamplingRecursive(bottomLeftPC, cellWidth, cellHeight, camera, memo, level - 1),
-            adaptiveSupersamplingRecursive(topRightPC, cellWidth, cellHeight, camera, memo, level - 1),
-            adaptiveSupersamplingRecursive(bottomRightPC, cellWidth, cellHeight, camera, memo, level - 1))
+    return adaptiveSupersamplingRecursive(topLeftPC, halfCellWidth, halfCellHeight, camera, memo, level - 1)
+        .add(adaptiveSupersamplingRecursive(bottomLeftPC, halfCellWidth, halfCellHeight, camera, memo, level - 1),
+            adaptiveSupersamplingRecursive(topRightPC, halfCellWidth, halfCellHeight, camera, memo, level - 1),
+            adaptiveSupersamplingRecursive(bottomRightPC, halfCellWidth, halfCellHeight, camera, memo, level - 1))
         .reduce(4);
   }
 
