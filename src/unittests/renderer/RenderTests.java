@@ -109,7 +109,6 @@ public class RenderTests {
 	 */
 	@Test
 	public void supersamplingSpheres() {
-		long startTime = System.currentTimeMillis();
 		Scene scene = new Scene("supersamplingSpheres");
 		Camera camera1 = new Camera(new Point3D(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
 				.setViewPlaneSize(150, 150).setDistance(1000);
@@ -170,8 +169,6 @@ public class RenderTests {
 				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE);
 		render.renderImage();
 		render.writeToImage();
-		long endTime = System.currentTimeMillis();
-		System.out.println((endTime - startTime) / 1000.0 + " seconds");
 	}
 
 	/**
@@ -179,7 +176,6 @@ public class RenderTests {
 	 */
 	@Test
 	public void supersamplingTwoSpheres() {
-		long startTime = System.currentTimeMillis();
 		Scene scene = new Scene("supersamplingTwoSpheres");
 		Camera camera1 = new Camera(new Point3D(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
 				.setViewPlaneSize(150, 150).setDistance(1000);
@@ -199,10 +195,9 @@ public class RenderTests {
 		Render render = new Render() //
 				.setImageWriter(new ImageWriter("refractionTwoSpheresAdaptiveSupersampling", 500, 500)) //
 				.setRayTracer(new BasicRayTracer(scene)) //
-				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE);
+				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
+				.setMultithreadingThreads(1);
 		render.renderImage();
 		render.writeToImage();
-		long endTime = System.currentTimeMillis();
-		System.out.println((endTime - startTime) / 1000.0 + " seconds");
 	}
 }
