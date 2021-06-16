@@ -51,6 +51,11 @@ public class Render {
   public int adaptiveMaxRecursionLevel = 3;
 
   /**
+   * thread count for multithreading
+   */
+  public int threads = 1;
+
+  /**
    * image writer
    */
   private ImageWriter imageWriter;
@@ -124,7 +129,7 @@ public class Render {
       int nX = imageWriter.getNx();
       int nY = imageWriter.getNy();
       // create thread pool
-      ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+      ExecutorService exec = Executors.newFixedThreadPool(this.threads);
       List<Callable<Void>> tasks = new ArrayList<>();
       for (int i = 0; i < nY; i++) {
         for (int j = 0; j < nX; j++) {
@@ -358,6 +363,20 @@ public class Render {
    */
   public Render setAdaptiveMaxRecursionLevel(int maxLevel) {
     this.adaptiveMaxRecursionLevel = maxLevel;
+    return this;
+  }
+
+  /**
+   * set multithreading thread count
+   * 
+   * @param threads number of threads - if the parameter is 0, the
+   *                availableProcessors will be used
+   * @return Render object
+   */
+  public Render setMultithreadingThreads(int threads) {
+    if (threads < 0)
+      throw new IllegalArgumentException("threads must be greater than or equal to 0");
+    this.threads = threads == 0 ? Runtime.getRuntime().availableProcessors() : threads;
     return this;
   }
 

@@ -195,7 +195,8 @@ public class RenderTests {
 		Render render = new Render() //
 				.setImageWriter(new ImageWriter("refractionTwoSpheresAdaptiveSupersampling", 500, 500)) //
 				.setRayTracer(new BasicRayTracer(scene)) //
-				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE);
+				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
+				.setMultithreadingThreads(1);
 		render.renderImage();
 		render.writeToImage();
 	}
