@@ -17,6 +17,8 @@ public class Color {
 	private final double g;
 	private final double b;
 
+	private final static int SIMILARITY_DELTA = 5;
+
 	/**
 	 * Black color = (0,0,0)
 	 */
@@ -120,6 +122,18 @@ public class Color {
 		if (k < 1)
 			throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
 		return new Color(r / k, g / k, b / k);
+	}
+
+	/**
+	 * Check if colors are similar enough for ending recursion in adaptive
+	 * supersampling
+	 * 
+	 * @param color color to compare with
+	 * @return whether colors are similar
+	 */
+	public boolean same(Color color) {
+		return Math.abs(this.r - color.r) < SIMILARITY_DELTA && Math.abs(this.b - color.b) < SIMILARITY_DELTA
+				&& Math.abs(this.g - color.g) < SIMILARITY_DELTA;
 	}
 
 }
