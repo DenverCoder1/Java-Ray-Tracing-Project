@@ -45,42 +45,6 @@ public class Camera {
     }
 
     /**
-     * getter for origin
-     * 
-     * @return origin
-     */
-    public Point3D getOrigin() {
-        return origin;
-    }
-
-    /**
-     * getter for vUp
-     * 
-     * @return vUp
-     */
-    public Vector getVUp() {
-        return vUp;
-    }
-
-    /**
-     * getter for vTo
-     * 
-     * @return vTo
-     */
-    public Vector getVTo() {
-        return vTo;
-    }
-
-    /**
-     * getter for vRight
-     * 
-     * @return vRight
-     */
-    public Vector getVRight() {
-        return vRight;
-    }
-
-    /**
      * getter for height
      * 
      * @return height
@@ -96,15 +60,6 @@ public class Camera {
      */
     public double getWidth() {
         return width;
-    }
-
-    /**
-     * getter for distance
-     * 
-     * @return distance
-     */
-    public double getDistance() {
-        return distance;
     }
 
     /**
@@ -172,33 +127,63 @@ public class Camera {
     /**
      * construct an equidistant grid of rays through a pixel
      * 
-     * @param middleRay ray for original pixel location
-     * @param gridSize  number of rows and columns for dividing pixel
-     * @param nX        number of pixels in width
-     * @param nY        number of pixels in height
-     * @return
+     * @param center      ray for original pixel location
+     * @param gridSize    number of rows and columns for dividing pixel
+     * @param pixelWidth  width of pixel
+     * @param pixelHeight height of pixel
+     * @return rays
      */
-    public List<Ray> getSupersamplingRays(Ray middleRay, int gridSize, double nX, double nY) {
-        double pixelWidth = width / nX;
-        double pixelHeight = height / nY;
-        Point3D pixel = middleRay.getPoint(distance);
-        List<Ray> supersamplingRays = new ArrayList<>();
-        // get top left of pixel
-        pixel = pixel.add(vRight.scale(-pixelWidth / 2)).add(vUp.scale(-pixelHeight / 2));
+    public List<Ray> getSupersamplingRays(Ray center, int gridSize, double pixelWidth, double pixelHeight) {
+        // get spacing amount based on grid size
+        double spacingVertical = pixelHeight / (gridSize + 1);
+        double spacingHorizontal = pixelWidth / (gridSize + 1);
+        // position of top left ray intersection with view plane
+        Point3D topLeft = center.getPoint(distance).add(vRight.scale(-pixelWidth / 2 - spacingHorizontal))
+                .add(vUp.scale(pixelHeight / 2 - spacingVertical));
+        return constructGridOfRays(topLeft, gridSize, spacingVertical, spacingHorizontal);
+    }
+
+    /**
+     * construct rays through each of four quadrants of a cell
+     * 
+     * @param center         center of cell ray
+     * @param halfCellWidth  half width of cell
+     * @param halfCellHeight half height of cell
+     * @return rays
+     */
+    public List<Ray> getAdaptiveSupersamplingRays(Ray center, double halfCellWidth, double halfCellHeight) {
+        // position of top left ray center ray
+        Point3D topLeft = center.getPoint(distance).add(vRight.scale(-halfCellWidth / 2))
+                .add(vUp.scale(halfCellHeight / 2));
+        return constructGridOfRays(topLeft, 2, halfCellHeight, halfCellWidth);
+    }
+
+    /**
+     * construct a grid of rays from a given point
+     * 
+     * @param topLeft           position of top left ray intersection
+     * @param gridSize          number of rows and columns for dividing pixel
+     * @param spacingVertical   distance from one pixel to another vertically
+     * @param spacingHorizontal distance from one pixel to another horizontally
+     * @return rays
+     */
+    public List<Ray> constructGridOfRays(Point3D topLeft, int gridSize, double spacingVertical,
+            double spacingHorizontal) {
+        List<Ray> rays = new ArrayList<>();
         // create grid of rays for supersampling
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
-                Point3D newPoint = pixel;
+                Point3D newPoint = topLeft;
                 if (row > 0) {
-                    newPoint = newPoint.add(vUp.scale(row * (pixelHeight / (gridSize - 1))));
+                    newPoint = newPoint.add(vUp.scale(-row * spacingVertical));
                 }
                 if (col > 0) {
-                    newPoint = newPoint.add(vRight.scale(col * (pixelWidth / (gridSize - 1))));
+                    newPoint = newPoint.add(vRight.scale(col * spacingHorizontal));
                 }
-                supersamplingRays.add(constructRayThroughPoint(newPoint));
+                rays.add(constructRayThroughPoint(newPoint));
             }
         }
-        return supersamplingRays;
+        return rays;
     }
 
 }

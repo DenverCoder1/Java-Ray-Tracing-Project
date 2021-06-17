@@ -2,15 +2,12 @@ package renderer;
 
 import elements.Camera;
 import primitives.Color;
-import primitives.Point3D;
 import primitives.Ray;
-import primitives.Vector;
 import scene.Scene;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.stream.Collectors;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +40,7 @@ public class Render {
   /**
    * maximum recursion level for adaptive supersampling
    */
-  private int adaptiveMaxRecursionLevel = 2;
+  private int adaptiveMaxRecursionLevel = 3;
 
   /**
    * thread count for multithreading
@@ -287,17 +284,18 @@ public class Render {
 
     long startTime = System.currentTimeMillis();
 
-    Camera camera = rayTracer.scene.getCamera();
-    final int nX = imageWriter.getNx();
-    final int nY = imageWriter.getNy();
-    final double pixelWidth = camera.getWidth() / imageWriter.getNx();
-    final double pixelHeight = camera.getHeight() / imageWriter.getNy();
-    if (threadsCount == 0)
+    if (threadsCount == 0) {
+      Camera camera = rayTracer.scene.getCamera();
+      final int nX = imageWriter.getNx();
+      final int nY = imageWriter.getNy();
+      final double pixelWidth = camera.getWidth() / imageWriter.getNx();
+      final double pixelHeight = camera.getHeight() / imageWriter.getNy();
       for (int i = 0; i < nY; ++i)
         for (int j = 0; j < nX; ++j)
           castRay(nX, nY, pixelWidth, pixelHeight, j, i);
-    else
+    } else {
       renderImageThreaded();
+    }
 
     long endTime = System.currentTimeMillis();
     System.out.println((endTime - startTime) / 1000.0 + " seconds");
@@ -335,17 +333,15 @@ public class Render {
   /**
    * Get the color for adaptive supersampling
    * 
-   * @param ray         ray for original pixel location
+   * @param center      ray for original pixel location
    * @param pixelWidth  camera width / number of pixels wide
    * @param pixelHeight camera height / number of pixels high
    * @return supersampling average color
    */
-  private Color getAdaptiveSupersamplingColor(Ray ray, double pixelWidth, double pixelHeight) {
+  private Color getAdaptiveSupersamplingColor(Ray center, double pixelWidth, double pixelHeight) {
     Scene scene = rayTracer.scene;
     Camera camera = scene.getCamera();
-    Point3D pc = ray.getPoint(camera.getDistance());
-    Map<Point3D, Color> memo = new HashMap<>();
-    return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, camera, memo, adaptiveMaxRecursionLevel);
+    return adaptiveSupersamplingRecursive(center, pixelWidth, pixelHeight, camera, adaptiveMaxRecursionLevel);
   }
 
   /**
@@ -357,64 +353,40 @@ public class Render {
    * @param cellWidth    width of cell that is being sampled
    * @param cellHeight   height of cell that is being sampled
    * @param cameraOrigin location of the camera
-   * @param memo         hash map of previously computed ray colors
    * @param level        recursion level - stops when reaches 1
    * @return average color of the cell
    */
-  private Color adaptiveSupersamplingRecursive(Point3D pc, double cellWidth, double cellHeight, Camera camera,
-      Map<Point3D, Color> memo, int level) {
-    Vector vRight = camera.getVRight();
-    Vector vUp = camera.getVUp();
+  private Color adaptiveSupersamplingRecursive(Ray center, double cellWidth, double cellHeight, Camera camera,
+      int level) {
 
+    // compute half cell width for locating rays and for recursive calls
     double halfCellWidth = cellWidth / 2;
     double halfCellHeight = cellHeight / 2;
 
-    // find points of the four corners
-    Point3D[] corners = new Point3D[4];
-    corners[0] = pc.add(vRight.scale(-halfCellWidth)).add(vUp.scale(halfCellHeight)); // top left
-    corners[1] = corners[0].add(vRight.scale(cellWidth)); // top right
-    corners[2] = corners[0].add(vUp.scale(-cellWidth)); // bottom left
-    corners[3] = corners[1].add(vUp.scale(-cellWidth)); // bottom right
-
-    // get colors of each point
-    Color[] cornerColors = new Color[4];
-    for (int i = 0; i < corners.length; i++) {
-      Point3D point = corners[i];
-      // get from hash map if already computed
-      if (memo.containsKey(point)) {
-        cornerColors[i] = memo.get(point);
-      }
-      // trace ray and store color in hash map
-      else {
-        Color pointColor = rayTracer.traceRay(camera.constructRayThroughPoint(point));
-        cornerColors[i] = pointColor;
-        memo.put(point, pointColor);
-      }
-    }
-
-    // stop when maximum recursion level
-    if (level <= 1) {
-      // return average of the corner colors
-      return cornerColors[0].add(cornerColors[1], cornerColors[2], cornerColors[3]).reduce(4);
-    }
-
-    // if all corners are the same color, return any corner color
-    if (cornerColors[0].equals(cornerColors[1]) && cornerColors[0].equals(cornerColors[2])
-        && cornerColors[0].equals(cornerColors[3])) {
-      return cornerColors[0];
-    }
-
     // calculate the centers of each quarter of the cell
-    Point3D topLeftPC = pc.add(vRight.scale(-halfCellWidth / 2)).add(vUp.scale(halfCellWidth / 2));
-    Point3D topRightPC = topLeftPC.add(vRight.scale(halfCellWidth));
-    Point3D bottomLeftPC = topLeftPC.add(vUp.scale(-halfCellWidth));
-    Point3D bottomRightPC = topRightPC.add(vUp.scale(-halfCellWidth));
+    List<Ray> corners = camera.getAdaptiveSupersamplingRays(center, halfCellWidth, halfCellHeight);
 
-    // calculate average colors of the four quarters
-    return adaptiveSupersamplingRecursive(topLeftPC, halfCellWidth, halfCellHeight, camera, memo, level - 1)
-        .add(adaptiveSupersamplingRecursive(bottomLeftPC, halfCellWidth, halfCellHeight, camera, memo, level - 1),
-            adaptiveSupersamplingRecursive(topRightPC, halfCellWidth, halfCellHeight, camera, memo, level - 1),
-            adaptiveSupersamplingRecursive(bottomRightPC, halfCellWidth, halfCellHeight, camera, memo, level - 1))
+    // get colors for each ray
+    List<Color> cornerColors = corners.stream().map(ray -> rayTracer.traceRay(ray)).collect(Collectors.toList());
+
+    // stop when maximum recursion level is reached
+    if (level <= 1) {
+      // return average of the quadrant colors
+      return cornerColors.get(0).add(cornerColors.get(1), cornerColors.get(2), cornerColors.get(3)).reduce(4);
+    }
+
+    // if all centers are the same color, return any quadrant color
+    if (cornerColors.get(0).same(cornerColors.get(1)) //
+        && cornerColors.get(0).same(cornerColors.get(2)) //
+        && cornerColors.get(0).same(cornerColors.get(3))) {
+      return cornerColors.get(0);
+    }
+
+    // calculate average colors of the four quadrants
+    return adaptiveSupersamplingRecursive(corners.get(0), halfCellWidth, halfCellHeight, camera, level - 1)
+        .add(adaptiveSupersamplingRecursive(corners.get(1), halfCellWidth, halfCellHeight, camera, level - 1),
+            adaptiveSupersamplingRecursive(corners.get(2), halfCellWidth, halfCellHeight, camera, level - 1),
+            adaptiveSupersamplingRecursive(corners.get(3), halfCellWidth, halfCellHeight, camera, level - 1))
         .reduce(4);
   }
 
@@ -428,10 +400,10 @@ public class Render {
   private Color getSupersamplingColor(Ray middleRay, int gridSize) {
     Scene scene = rayTracer.scene;
     Camera camera = scene.getCamera();
-    int nX = imageWriter.getNx();
-    int nY = imageWriter.getNy();
+    double pixelWidth = camera.getWidth() / imageWriter.getNx();
+    double pixelHeight = camera.getHeight() / imageWriter.getNy();
     // list for returning rays
-    List<Ray> supersamplingRays = camera.getSupersamplingRays(middleRay, gridSize, nX, nY);
+    List<Ray> supersamplingRays = camera.getSupersamplingRays(middleRay, gridSize, pixelWidth, pixelHeight);
     // add the intersected colors together
     Color pixelColor = Color.BLACK;
     for (Ray r : supersamplingRays) {

@@ -22,8 +22,8 @@ import static primitives.Util.*;
  */
 public class BasicRayTracer extends RayTracerBase {
 
-  private static final int MAX_CALC_COLOR_LEVEL = 10;
-  private static final double MIN_CALC_COLOR_K = 0.001;
+  private static final int MAX_CALC_COLOR_LEVEL = 5;
+  private static final double MIN_CALC_COLOR_K = 0.1;
 
   /**
    * constructor
@@ -57,13 +57,15 @@ public class BasicRayTracer extends RayTracerBase {
    * 
    * @param geopoint the intersection point of the geometry and point
    * @param ray      the ray from which the point is viewed
+   * @param level    recursion level before stopping
+   * @param k        effect factor
    * @return the color for the pixel
    */
   private Color calcColor(GeoPoint geopoint, Ray ray, int level, double k) {
-    if (level > MAX_CALC_COLOR_LEVEL || k < MIN_CALC_COLOR_K) {
+    if (level <= 1 || k < MIN_CALC_COLOR_K) {
       return Color.BLACK;
     }
-    // shadow rays
+    // diffuse, specular, shadow rays
     Color result = geopoint.geometry.getEmission().add(calcLocalEffects(geopoint, ray, k));
     // reflection rays
     double kr = geopoint.geometry.getMaterial().kR;
@@ -75,7 +77,7 @@ public class BasicRayTracer extends RayTracerBase {
         List<GeoPoint> intersections = scene.geometries.findGeoIntersections(reflectedRay);
         GeoPoint reflectedPoint = reflectedRay.findClosestGeoPoint(intersections);
         if (reflectedPoint != null)
-          result = result.add(calcColor(reflectedPoint, reflectedRay, level + 1, kkr).scale(kr));
+          result = result.add(calcColor(reflectedPoint, reflectedRay, level - 1, kkr).scale(kr));
       }
     }
     // transparency (refraction rays)
@@ -86,7 +88,7 @@ public class BasicRayTracer extends RayTracerBase {
       List<GeoPoint> intersections = scene.geometries.findGeoIntersections(refractedRay);
       GeoPoint refractedPoint = refractedRay.findClosestGeoPoint(intersections);
       if (refractedPoint != null)
-        result = result.add(calcColor(refractedPoint, refractedRay, level + 1, kkt).scale(kt));
+        result = result.add(calcColor(refractedPoint, refractedRay, level - 1, kkt).scale(kt));
     }
     return result;
   }
@@ -99,7 +101,7 @@ public class BasicRayTracer extends RayTracerBase {
    * @return the color for the pixel
    */
   private Color calcColor(GeoPoint geopoint, Ray ray) {
-    return calcColor(geopoint, ray, 1, 1.0).add(scene.ambientLight.getIntensity());
+    return calcColor(geopoint, ray, MAX_CALC_COLOR_LEVEL, 1.0).add(scene.ambientLight.getIntensity());
   }
 
   /**
@@ -107,6 +109,7 @@ public class BasicRayTracer extends RayTracerBase {
    * 
    * @param geopoint the intersection point of the geometry and point
    * @param ray      the ray from which the point is viewed
+   * @param k        effect factor
    * @return the color to add
    */
   private Color calcLocalEffects(GeoPoint geopoint, Ray ray, double k) {

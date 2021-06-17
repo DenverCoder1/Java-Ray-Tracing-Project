@@ -132,7 +132,8 @@ public class Color {
 	 * @return whether colors are similar
 	 */
 	public boolean same(Color color) {
-		return Math.abs(this.r - color.r) < SIMILARITY_DELTA && Math.abs(this.b - color.b) < SIMILARITY_DELTA
+		return Math.abs(this.r - color.r) < SIMILARITY_DELTA //
+				&& Math.abs(this.b - color.b) < SIMILARITY_DELTA //
 				&& Math.abs(this.g - color.g) < SIMILARITY_DELTA;
 	}
 

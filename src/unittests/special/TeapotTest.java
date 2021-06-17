@@ -1563,7 +1563,7 @@ public class TeapotTest {
                 .setRayTracer(new BasicRayTracer(scene)) //
                 .setDebugPrint() //
                 .setMultithreading(0) //
-                .setSupersamplingType(SUPERSAMPLING_TYPE.SUPERSAMPLING) //
+                .setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
                 .setAdaptiveMaxRecursionLevel(2);
         render.renderImage();
         render.printGrid(50, new Color(java.awt.Color.YELLOW));
