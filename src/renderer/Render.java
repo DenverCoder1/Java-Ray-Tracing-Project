@@ -38,12 +38,12 @@ public class Render {
   /**
    * number of rows and columns for supersampling
    */
-  private int supersamplingGridSize = 9;
+  private int supersamplingGridSize = 3;
 
   /**
    * maximum recursion level for adaptive supersampling
    */
-  private int adaptiveMaxRecursionLevel = 3;
+  private int adaptiveMaxRecursionLevel = 2;
 
   /**
    * thread count for multithreading
@@ -239,8 +239,11 @@ public class Render {
    * the Renderer object - with multi-threading
    */
   private void renderImageThreaded() {
+    Camera camera = rayTracer.scene.getCamera();
     final int nX = imageWriter.getNx();
     final int nY = imageWriter.getNy();
+    final double pixelWidth = camera.getWidth() / imageWriter.getNx();
+    final double pixelHeight = camera.getHeight() / imageWriter.getNy();
     final Pixel thePixel = new Pixel(nY, nX);
     // Generate threads
     Thread[] threads = new Thread[threadsCount];
@@ -248,7 +251,7 @@ public class Render {
       threads[i] = new Thread(() -> {
         Pixel pixel = new Pixel();
         while (thePixel.nextPixel(pixel))
-          castRay(nX, nY, pixel.col, pixel.row);
+          castRay(nX, nY, pixelWidth, pixelHeight, pixel.col, pixel.row);
       });
     }
     // Start threads
@@ -267,7 +270,7 @@ public class Render {
       }
 
     if (print)
-      System.out.print("\r100%");
+      System.out.println("\nFinished");
   }
 
   /**
@@ -284,12 +287,15 @@ public class Render {
 
     long startTime = System.currentTimeMillis();
 
+    Camera camera = rayTracer.scene.getCamera();
     final int nX = imageWriter.getNx();
     final int nY = imageWriter.getNy();
+    final double pixelWidth = camera.getWidth() / imageWriter.getNx();
+    final double pixelHeight = camera.getHeight() / imageWriter.getNy();
     if (threadsCount == 0)
       for (int i = 0; i < nY; ++i)
         for (int j = 0; j < nX; ++j)
-          castRay(nX, nY, j, i);
+          castRay(nX, nY, pixelWidth, pixelHeight, j, i);
     else
       renderImageThreaded();
 
@@ -300,18 +306,20 @@ public class Render {
   /**
    * Cast ray from camera in order to color a pixel
    * 
-   * @param nX  resolution on X axis (number of pixels in row)
-   * @param nY  resolution on Y axis (number of pixels in column)
-   * @param col pixel's column number (pixel index in row)
-   * @param row pixel's row number (pixel index in column)
+   * @param nX          resolution on X axis (number of pixels in row)
+   * @param nY          resolution on Y axis (number of pixels in column)
+   * @param pixelWidth  camera width / number of pixels wide
+   * @param pixelHeight camera height / number of pixels high
+   * @param col         pixel's column number (pixel index in row)
+   * @param row         pixel's row number (pixel index in column)
    */
-  private void castRay(int nX, int nY, int col, int row) {
+  private void castRay(int nX, int nY, double pixelWidth, double pixelHeight, int col, int row) {
     Camera camera = rayTracer.scene.getCamera();
     Ray ray = camera.constructRayThroughPixel(nX, nY, col, row);
     Color pixelColor;
     // adaptive supersampling is enabled
     if (supersamplingType == SUPERSAMPLING_TYPE.ADAPTIVE) {
-      pixelColor = getAdaptiveSupersamplingColor(ray);
+      pixelColor = getAdaptiveSupersamplingColor(ray, pixelWidth, pixelHeight);
     }
     // supersampling is enabled
     else if (supersamplingType == SUPERSAMPLING_TYPE.SUPERSAMPLING) {
@@ -327,15 +335,15 @@ public class Render {
   /**
    * Get the color for adaptive supersampling
    * 
-   * @param ray ray for original pixel location
+   * @param ray         ray for original pixel location
+   * @param pixelWidth  camera width / number of pixels wide
+   * @param pixelHeight camera height / number of pixels high
    * @return supersampling average color
    */
-  private Color getAdaptiveSupersamplingColor(Ray ray) {
+  private Color getAdaptiveSupersamplingColor(Ray ray, double pixelWidth, double pixelHeight) {
     Scene scene = rayTracer.scene;
     Camera camera = scene.getCamera();
     Point3D pc = ray.getPoint(camera.getDistance());
-    double pixelWidth = camera.getWidth() / imageWriter.getNx();
-    double pixelHeight = camera.getHeight() / imageWriter.getNy();
     Map<Point3D, Color> memo = new HashMap<>();
     return adaptiveSupersamplingRecursive(pc, pixelWidth, pixelHeight, camera, memo, adaptiveMaxRecursionLevel);
   }
