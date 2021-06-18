@@ -348,29 +348,29 @@ public class Render {
     double halfCellHeight = cellHeight / 2;
 
     // calculate the centers of each quarter of the cell
-    List<Ray> corners = camera.constructAdaptiveSupersamplingRays(center, halfCellWidth, halfCellHeight);
+    List<Ray> quadrantRays = camera.constructAdaptiveSupersamplingRays(center, halfCellWidth, halfCellHeight);
 
     // get colors for each ray
-    List<Color> cornerColors = corners.stream().map(ray -> rayTracer.traceRay(ray)).collect(Collectors.toList());
+    List<Color> quadrantColors = quadrantRays.stream().map(ray -> rayTracer.traceRay(ray)).collect(Collectors.toList());
 
     // stop when maximum recursion level is reached
     if (level <= 1) {
       // return average of the quadrant colors
-      return cornerColors.get(0).add(cornerColors.get(1), cornerColors.get(2), cornerColors.get(3)).reduce(4);
+      return quadrantColors.get(0).add(quadrantColors.get(1), quadrantColors.get(2), quadrantColors.get(3)).reduce(4);
     }
 
     // if all centers are the same color, return any quadrant color
-    if (cornerColors.get(0).same(cornerColors.get(1)) //
-        && cornerColors.get(0).same(cornerColors.get(2)) //
-        && cornerColors.get(0).same(cornerColors.get(3))) {
-      return cornerColors.get(0);
+    if (quadrantColors.get(0).same(quadrantColors.get(1)) //
+        && quadrantColors.get(0).same(quadrantColors.get(2)) //
+        && quadrantColors.get(0).same(quadrantColors.get(3))) {
+      return quadrantColors.get(0);
     }
 
     // calculate average colors of the four quadrants
-    return calcAdaptiveSupersamplingColor(corners.get(0), halfCellWidth, halfCellHeight, camera, level - 1)
-        .add(calcAdaptiveSupersamplingColor(corners.get(1), halfCellWidth, halfCellHeight, camera, level - 1),
-            calcAdaptiveSupersamplingColor(corners.get(2), halfCellWidth, halfCellHeight, camera, level - 1),
-            calcAdaptiveSupersamplingColor(corners.get(3), halfCellWidth, halfCellHeight, camera, level - 1))
+    return calcAdaptiveSupersamplingColor(quadrantRays.get(0), halfCellWidth, halfCellHeight, camera, level - 1)
+        .add(calcAdaptiveSupersamplingColor(quadrantRays.get(1), halfCellWidth, halfCellHeight, camera, level - 1),
+            calcAdaptiveSupersamplingColor(quadrantRays.get(2), halfCellWidth, halfCellHeight, camera, level - 1),
+            calcAdaptiveSupersamplingColor(quadrantRays.get(3), halfCellWidth, halfCellHeight, camera, level - 1))
         .reduce(4);
   }
 
