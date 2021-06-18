@@ -1549,10 +1549,10 @@ public final class Main {
 		Render render = new Render() //
 				.setImageWriter(imageWriter) //
 				.setRayTracer(new BasicRayTracer(scene)) //
-				// .setDebugPrint() //
+				.setDebugPrint() //
 				.setMultithreading(0) //
 				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
-				.setAdaptiveMaxRecursionLevel(2);
+				.setAdaptiveMaxRecursionLevel(4);
 		render.renderImage();
 		render.printGrid(50, new Color(java.awt.Color.YELLOW));
 		render.writeToImage();

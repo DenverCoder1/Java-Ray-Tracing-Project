@@ -17,7 +17,7 @@ public class Color {
 	private final double g;
 	private final double b;
 
-	private final static int SIMILARITY_DELTA = 5;
+	private static final int SIMILARITY_DELTA = 5;
 
 	/**
 	 * Black color = (0,0,0)
@@ -128,10 +128,14 @@ public class Color {
 	 * Check if colors are similar enough for ending recursion in adaptive
 	 * supersampling
 	 * 
+	 * @author Jonah Lawrence
+	 * @author Elad Harizy
+	 * 
 	 * @param color color to compare with
 	 * @return whether colors are similar
 	 */
 	public boolean same(Color color) {
+		// same if the difference in red, green, and blue values are each less than 5
 		return Math.abs(this.r - color.r) < SIMILARITY_DELTA //
 				&& Math.abs(this.b - color.b) < SIMILARITY_DELTA //
 				&& Math.abs(this.g - color.g) < SIMILARITY_DELTA;

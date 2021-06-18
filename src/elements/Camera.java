@@ -98,10 +98,10 @@ public class Camera {
      */
     public Ray constructRayThroughPixel(int nX, int nY, int j, int i) {
         Point3D pc = origin.add(vTo.scale(distance));
-        double rY = height / nY;
-        double rX = width / nX;
-        double xj = (j - ((nX - 1) / 2.0)) * rX;
-        double yi = -(i - ((nY - 1) / 2.0)) * rY;
+        double pixelHeight = height / nY;
+        double pixelWidth = width / nX;
+        double xj = (j - ((nX - 1) / 2.0)) * pixelWidth;
+        double yi = -(i - ((nY - 1) / 2.0)) * pixelHeight;
 
         Point3D pij = pc;
         if (!isZero(xj))
@@ -109,8 +109,8 @@ public class Camera {
         if (!isZero(yi))
             pij = pij.add(vUp.scale(yi));
 
-        Vector vij = pij.subtract(origin).normalize();
-        return new Ray(origin, vij);
+        Vector direction = pij.subtract(origin).normalize();
+        return new Ray(origin, direction);
     }
 
     /**
@@ -133,7 +133,7 @@ public class Camera {
      * @param pixelHeight height of pixel
      * @return rays
      */
-    public List<Ray> getSupersamplingRays(Ray center, int gridSize, double pixelWidth, double pixelHeight) {
+    public List<Ray> constructSupersamplingRays(Ray center, int gridSize, double pixelWidth, double pixelHeight) {
         // get spacing amount based on grid size
         double spacingVertical = pixelHeight / (gridSize + 1);
         double spacingHorizontal = pixelWidth / (gridSize + 1);
@@ -151,7 +151,7 @@ public class Camera {
      * @param halfCellHeight half height of cell
      * @return rays
      */
-    public List<Ray> getAdaptiveSupersamplingRays(Ray center, double halfCellWidth, double halfCellHeight) {
+    public List<Ray> constructAdaptiveSupersamplingRays(Ray center, double halfCellWidth, double halfCellHeight) {
         // position of top left ray center ray
         Point3D topLeft = center.getPoint(distance).add(vRight.scale(-halfCellWidth / 2))
                 .add(vUp.scale(halfCellHeight / 2));

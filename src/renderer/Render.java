@@ -3,7 +3,6 @@ package renderer;
 import elements.Camera;
 import primitives.Color;
 import primitives.Ray;
-import scene.Scene;
 
 import java.util.List;
 import java.util.MissingResourceException;
@@ -317,11 +316,11 @@ public class Render {
     Color pixelColor;
     // adaptive supersampling is enabled
     if (supersamplingType == SUPERSAMPLING_TYPE.ADAPTIVE) {
-      pixelColor = getAdaptiveSupersamplingColor(ray, pixelWidth, pixelHeight);
+      pixelColor = calcAdaptiveSupersamplingColor(ray, pixelWidth, pixelHeight, camera, adaptiveMaxRecursionLevel);
     }
     // supersampling is enabled
     else if (supersamplingType == SUPERSAMPLING_TYPE.SUPERSAMPLING) {
-      pixelColor = getSupersamplingColor(ray, supersamplingGridSize);
+      pixelColor = calcSupersamplingColor(ray, supersamplingGridSize);
     }
     // no supersampling
     else {
@@ -331,21 +330,6 @@ public class Render {
   }
 
   /**
-   * Get the color for adaptive supersampling
-   * 
-   * @param center      ray for original pixel location
-   * @param pixelWidth  camera width / number of pixels wide
-   * @param pixelHeight camera height / number of pixels high
-   * @return supersampling average color
-   */
-  private Color getAdaptiveSupersamplingColor(Ray center, double pixelWidth, double pixelHeight) {
-    Scene scene = rayTracer.scene;
-    Camera camera = scene.getCamera();
-    return adaptiveSupersamplingRecursive(center, pixelWidth, pixelHeight, camera, adaptiveMaxRecursionLevel);
-  }
-
-  /**
-   *
    * Recursive function to sample cell colors and recursively sample smaller cells
    * when there is color variance
    * 
@@ -356,7 +340,7 @@ public class Render {
    * @param level        recursion level - stops when reaches 1
    * @return average color of the cell
    */
-  private Color adaptiveSupersamplingRecursive(Ray center, double cellWidth, double cellHeight, Camera camera,
+  private Color calcAdaptiveSupersamplingColor(Ray center, double cellWidth, double cellHeight, Camera camera,
       int level) {
 
     // compute half cell width for locating rays and for recursive calls
@@ -364,7 +348,7 @@ public class Render {
     double halfCellHeight = cellHeight / 2;
 
     // calculate the centers of each quarter of the cell
-    List<Ray> corners = camera.getAdaptiveSupersamplingRays(center, halfCellWidth, halfCellHeight);
+    List<Ray> corners = camera.constructAdaptiveSupersamplingRays(center, halfCellWidth, halfCellHeight);
 
     // get colors for each ray
     List<Color> cornerColors = corners.stream().map(ray -> rayTracer.traceRay(ray)).collect(Collectors.toList());
@@ -383,10 +367,10 @@ public class Render {
     }
 
     // calculate average colors of the four quadrants
-    return adaptiveSupersamplingRecursive(corners.get(0), halfCellWidth, halfCellHeight, camera, level - 1)
-        .add(adaptiveSupersamplingRecursive(corners.get(1), halfCellWidth, halfCellHeight, camera, level - 1),
-            adaptiveSupersamplingRecursive(corners.get(2), halfCellWidth, halfCellHeight, camera, level - 1),
-            adaptiveSupersamplingRecursive(corners.get(3), halfCellWidth, halfCellHeight, camera, level - 1))
+    return calcAdaptiveSupersamplingColor(corners.get(0), halfCellWidth, halfCellHeight, camera, level - 1)
+        .add(calcAdaptiveSupersamplingColor(corners.get(1), halfCellWidth, halfCellHeight, camera, level - 1),
+            calcAdaptiveSupersamplingColor(corners.get(2), halfCellWidth, halfCellHeight, camera, level - 1),
+            calcAdaptiveSupersamplingColor(corners.get(3), halfCellWidth, halfCellHeight, camera, level - 1))
         .reduce(4);
   }
 
@@ -397,13 +381,12 @@ public class Render {
    * @param gridSize  number of rows and columns for dividing pixel
    * @return supersampling average color
    */
-  private Color getSupersamplingColor(Ray middleRay, int gridSize) {
-    Scene scene = rayTracer.scene;
-    Camera camera = scene.getCamera();
+  private Color calcSupersamplingColor(Ray middleRay, int gridSize) {
+    Camera camera = rayTracer.scene.getCamera();
     double pixelWidth = camera.getWidth() / imageWriter.getNx();
     double pixelHeight = camera.getHeight() / imageWriter.getNy();
     // list for returning rays
-    List<Ray> supersamplingRays = camera.getSupersamplingRays(middleRay, gridSize, pixelWidth, pixelHeight);
+    List<Ray> supersamplingRays = camera.constructSupersamplingRays(middleRay, gridSize, pixelWidth, pixelHeight);
     // add the intersected colors together
     Color pixelColor = Color.BLACK;
     for (Ray r : supersamplingRays) {
