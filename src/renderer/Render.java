@@ -34,7 +34,7 @@ public class Render {
   /**
    * number of rows and columns for supersampling
    */
-  private int supersamplingGridSize = 3;
+  private int supersamplingGridSize = 9;
 
   /**
    * maximum recursion level for adaptive supersampling

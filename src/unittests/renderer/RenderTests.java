@@ -200,4 +200,129 @@ public class RenderTests {
 		render.renderImage();
 		render.writeToImage();
 	}
+
+	/**
+	 * Test reflective sphere, colored background
+	 */
+	@Test
+	public void reflectiveSphere() {
+		Scene scene = new Scene("reflectiveSphere");
+		Camera camera1 = new Camera(new Point3D(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
+				.setViewPlaneSize(150, 150).setDistance(550);
+
+		scene.geometries.add( //
+				// reflective sphere
+				new Sphere(new Point3D(15, 40, -50), 20) //
+						.setEmission(new Color(30, 30, 30)) //
+						.setMaterial(new Material().setKD(0.4).setKS(0.5).setShininess(20).setKR(0.4)),
+				// pink sphere
+				new Sphere(new Point3D(30, 0, -40), 10) //
+						.setEmission(new Color(java.awt.Color.MAGENTA)) //
+						.setMaterial(new Material().setKD(0.4).setKS(0.3).setShininess(80).setKT(0.3)));
+
+		scene.lights.add( //
+				new SpotLight(new Color(1000, 600, 0), new Point3D(-100, -100, 500), new Vector(-1, -1, -2)) //
+						.setKL(0.0004).setKQ(0.0000006));
+
+		scene.lights.add(new DirectionalLight(new Color(500, 300, 0), new Vector(0, -1, 0)));
+
+		scene.lights.add(new PointLight(new Color(500, 250, 250), new Point3D(10, -200, -300)) //
+				.setKL(0.0005).setKQ(0.0005));
+
+		scene.setCamera(camera1);
+
+		scene.background = new Color(0, 250, 250);
+
+		Render render = new Render() //
+				.setImageWriter(new ImageWriter("reflectiveSphere", 500, 500)) //
+				.setRayTracer(new BasicRayTracer(scene)) //
+				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
+				.setMultithreading(3);
+		render.renderImage();
+		render.writeToImage();
+	}
+
+	/**
+	 * Test Cornell Box Custom Scene
+	 */
+	@Test
+	public void cornellBoxTest() {
+		Scene scene = new Scene("cornellBoxTest");
+		Camera camera1 = new Camera(new Point3D(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
+				.setViewPlaneSize(150, 150).setDistance(550);
+
+		scene.geometries.add( //
+				// blue sphere
+				new Sphere(new Point3D(-40, 25, -80), 35) //
+						.setEmission(new Color(java.awt.Color.BLUE)) //
+						.setMaterial(new Material().setKD(0.4).setKS(0.3).setShininess(100).setKT(0.45)),
+				// magenta sphere
+				new Sphere(new Point3D(30, 0, -40), 20) //
+						.setEmission(new Color(java.awt.Color.MAGENTA)) //
+						.setMaterial(new Material().setKD(0.4).setKS(0.3).setShininess(80).setKT(0.3)),
+				// reflective sphere
+				new Sphere(new Point3D(15, 40, -50), 20) //
+						.setEmission(new Color(30, 30, 30)) //
+						.setMaterial(new Material().setKD(0.2).setKS(0.3).setShininess(20).setKR(0.4)),
+				// red sphere
+				new Sphere(new Point3D(-10, -45, 45), 40) //
+						.setEmission(new Color(java.awt.Color.RED)) //
+						.setMaterial(new Material().setKD(0.5).setKS(0.5).setShininess(100)),
+				// ceiling
+				new Triangle(new Point3D(-500, 500, -100), new Point3D(500, 500, -100), new Point3D(0, 0, -300)) //
+						.setEmission(new Color(200, 200, 200)) //
+						.setMaterial(new Material().setKD(0.01).setKS(0.01).setShininess(10)), //
+				// floor
+				new Triangle(new Point3D(-500, -500, -100), new Point3D(500, -500, -100), new Point3D(0, 0, -300)) //
+						.setEmission(new Color(235, 235, 235)) //
+						.setMaterial(new Material().setKD(0.01).setKS(0.01).setShininess(10).setKR(0.15)), //
+				// left wall
+				new Triangle(new Point3D(-500, -500, -100), new Point3D(-500, 500, -100), new Point3D(0, 0, -300)) //
+						.setEmission(new Color(177, 35, 21)) //
+						.setMaterial(new Material().setKR(0.15)), //
+				// right wall
+				new Triangle(new Point3D(500, -500, -100), new Point3D(500, 500, -100), new Point3D(0, 0, -300)) //
+						.setEmission(new Color(37, 83, 18)) //
+						.setMaterial(new Material().setKR(0.15)), //
+				// back wall
+				new Plane(new Point3D(0, 0, -275), new Point3D(0, 1, -275), new Point3D(1, 0, -275)) //
+						.setEmission(new Color(220, 220, 220)) //
+						.setMaterial(new Material().setKR(0.2)), //
+				// wall behind camera
+				new Plane(new Point3D(0, 0, 1001), new Point3D(0, 1, 1001), new Point3D(1, 0, 1001)) //
+						.setEmission(new Color(220, 220, 220)), //
+				// ceiling light
+				new Triangle(new Point3D(-20, 120, -250), new Point3D(-40, 140, -242), new Point3D(40, 140, -242)) //
+						.setEmission(new Color(250, 250, 250)) //
+						.setMaterial(new Material().setKS(1).setKD(1).setShininess(100)), //
+				new Triangle(new Point3D(-20, 120, -250), new Point3D(20, 120, -250), new Point3D(40, 140, -242)) //
+						.setEmission(new Color(250, 250, 250)) //
+						.setMaterial(new Material().setKS(1).setKD(1).setShininess(100)) //
+		);
+
+		scene.lights.add( //
+				new SpotLight(new Color(1000, 600, 0), new Point3D(-100, -100, 500), new Vector(-1, -1, -2)) //
+						.setKL(0.0004).setKQ(0.0000006));
+
+		scene.lights.add(new DirectionalLight(new Color(500, 300, 0), new Vector(0, -1, 0)));
+
+		scene.lights.add(new DirectionalLight(new Color(400, 300, 0), new Vector(0, 0, -1)));
+
+		scene.lights.add(new PointLight(new Color(500, 250, 250), new Point3D(10, -200, -300)) //
+				.setKL(0.0005).setKQ(0.0005));
+
+		scene.lights.add( //
+				new SpotLight(new Color(800, 400, 0), new Point3D(0, 135, -242), new Vector(0, -1, 0)) //
+						.setKL(0.005).setKQ(0.000007));
+
+		scene.setCamera(camera1);
+
+		Render render = new Render() //
+				.setImageWriter(new ImageWriter("cornellBoxTest", 500, 500)) //
+				.setRayTracer(new BasicRayTracer(scene)) //
+				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
+				.setMultithreading(3);
+		render.renderImage();
+		render.writeToImage();
+	}
 }
