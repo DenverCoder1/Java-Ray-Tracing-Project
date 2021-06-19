@@ -479,7 +479,7 @@ public class RenderTests {
 				.setImageWriter(new ImageWriter("bigCornellBoxTest", 500, 500)) //
 				.setRayTracer(new BasicRayTracer(scene)) //
 				.setDebugPrint() //
-				.setSupersamplingType(SUPERSAMPLING_TYPE.SUPERSAMPLING) //
+				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
 				.setAdaptiveMaxRecursionLevel(3) //
 				.setMultithreading(3);
 		render.renderImage();
