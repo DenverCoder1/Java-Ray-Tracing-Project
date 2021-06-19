@@ -6,6 +6,7 @@ package unittests.lights;
 import org.junit.Test;
 
 import elements.*;
+import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
 import primitives.*;
