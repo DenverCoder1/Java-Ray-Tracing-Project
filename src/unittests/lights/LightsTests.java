@@ -14,8 +14,8 @@ import scene.Scene;
  * @author Dan
  */
 public class LightsTests {
-	private Scene scene1 = new Scene("Test scene");
-	private Scene scene2 = new Scene("Test scene") //
+	private Scene scene1 = new Scene("LightsTests1");
+	private Scene scene2 = new Scene("LightsTests2") //
 			.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), 0.15));
 	private Camera camera1 = new Camera(new Point3D(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
 			.setViewPlaneSize(150, 150) //
