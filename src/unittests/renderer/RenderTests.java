@@ -286,7 +286,7 @@ public class RenderTests {
 						.setMaterial(new Material().setKR(0.15)), //
 				// back wall
 				new Plane(new Point3D(0, 0, -275), new Point3D(0, 1, -275), new Point3D(1, 0, -275)) //
-						.setEmission(new Color(220, 220, 220)) //
+						.setEmission(new Color(190, 190, 190)) //
 						.setMaterial(new Material().setKR(0.2)), //
 				// wall behind camera
 				new Plane(new Point3D(0, 0, 1001), new Point3D(0, 1, 1001), new Point3D(1, 0, 1001)) //
@@ -321,6 +321,7 @@ public class RenderTests {
 				.setImageWriter(new ImageWriter("cornellBoxTest", 500, 500)) //
 				.setRayTracer(new BasicRayTracer(scene)) //
 				.setSupersamplingType(SUPERSAMPLING_TYPE.ADAPTIVE) //
+				.setAdaptiveMaxRecursionLevel(2) //
 				.setMultithreading(3);
 		render.renderImage();
 		render.writeToImage();
