@@ -161,7 +161,7 @@ public class BasicRayTracer extends RayTracerBase {
   private Color calcSpecular(double ks, Vector l, Vector n, Vector v, int nShininess, Color lightIntensity) {
     Vector r = l.subtract(n.scale(alignZero(2 * l.dotProduct(n))));
     double vr = alignZero(v.dotProduct(r));
-    return lightIntensity.scale(ks * Math.pow(-vr, nShininess));
+    return lightIntensity.scale(Math.abs(ks * Math.pow(-vr, nShininess)));
   }
 
   /**
