@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import primitives.Point3D;
 import primitives.Ray;
 
 /**
@@ -56,16 +55,16 @@ public class Geometries implements Intersectable {
     }
 
     @Override
-    public List<Point3D> findIntersections(Ray ray) {
+    public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
         // return null if no geometries
         if (geometryList == null) {
             return null;
         }
         // initialize intersection list to null
-        List<Point3D> intersections = null;
+        List<GeoPoint> intersections = null;
         Iterator<Intersectable> iterator = geometryList.iterator();
         while (iterator.hasNext()) {
-            List<Point3D> newPoints = iterator.next().findIntersections(ray);
+            List<GeoPoint> newPoints = iterator.next().findGeoIntersections(ray, maxDistance);
             // make sure there are points
             if (newPoints != null) {
                 // otherwise, initialize with a list when first intersection found
