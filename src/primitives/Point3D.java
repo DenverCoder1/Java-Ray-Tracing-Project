@@ -45,28 +45,28 @@ public class Point3D {
   /**
    * getter for X
    * 
-   * @return x
+   * @return x as a double
    */
-  public Coordinate getX() {
-    return this.x;
+  public double getX() {
+    return this.x.coord;
   }
 
   /**
    * getter for Y
    * 
-   * @return y
+   * @return y as a double
    */
-  public Coordinate getY() {
-    return this.y;
+  public double getY() {
+    return this.y.coord;
   }
 
   /**
    * getter for Z
    * 
-   * @return z
+   * @return z as a double
    */
-  public Coordinate getZ() {
-    return this.z;
+  public double getZ() {
+    return this.z.coord;
   }
 
   /**
