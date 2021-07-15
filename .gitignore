@@ -24,3 +24,6 @@ hs_err_pid*
 
 # VSCode Stuff
 .vscode/
+
+# output images folder
+images
