@@ -7,9 +7,9 @@ Jonah Lawrence & Elad Harizy
 ## Rendered Images
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/20955511/125821918-4ccb9209-e627-47dc-acaa-d1e6fd69316f.png" alt="cornellBoxTest-15s" width="280px">
-  <img src="https://user-images.githubusercontent.com/20955511/125822193-f9997267-b95b-4a3a-ae70-308bebbd3229.png" alt="cornellBoxTest-46s" width="280px">
-  <img src="https://user-images.githubusercontent.com/20955511/125822014-cbd2f613-f20c-415c-92ec-b35f9d10d483.png" alt="teapotTest-15s" width="280px">
+  <img src="https://user-images.githubusercontent.com/20955511/125821918-4ccb9209-e627-47dc-acaa-d1e6fd69316f.png" alt="cornellBoxTest-15s" width="260px">
+  <img src="https://user-images.githubusercontent.com/20955511/125822193-f9997267-b95b-4a3a-ae70-308bebbd3229.png" alt="cornellBoxTest-46s" width="260px">
+  <img src="https://user-images.githubusercontent.com/20955511/125822014-cbd2f613-f20c-415c-92ec-b35f9d10d483.png" alt="teapotTest-15s" width="260px">
 </p>
 
 ## Project Stages
