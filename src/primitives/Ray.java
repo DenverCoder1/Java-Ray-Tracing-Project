@@ -19,12 +19,12 @@ public class Ray {
   /**
    * ray origin
    */
-  final Point3D origin;
+  public final Point3D origin;
 
   /**
    * ray direction vector
    */
-  final Vector direction;
+  public final Vector direction;
 
   /**
    * Constructor that takes the origin and direction
@@ -92,7 +92,7 @@ public class Ray {
       return null;
     }
     for (GeoPoint p : pointsList) {
-      double temp = p.point.distance(origin);
+      double temp = p.point.distanceSquared(origin);
       if (temp < closestDistance) {
         closestDistance = temp;
         result = p;

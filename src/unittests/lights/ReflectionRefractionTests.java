@@ -6,11 +6,11 @@ package unittests.lights;
 import org.junit.Test;
 
 import elements.*;
-import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
 import primitives.*;
 import renderer.*;
+import renderer.Render.SUPERSAMPLING_TYPE;
 import scene.Scene;
 
 /**
@@ -20,7 +20,7 @@ import scene.Scene;
  * @author dzilb
  */
 public class ReflectionRefractionTests {
-	private Scene scene = new Scene("Test scene");
+	private Scene scene = new Scene("ReflectionRefractionTests");
 
 	/**
 	 * Produce a picture of a sphere lighted by a spot light
@@ -44,7 +44,8 @@ public class ReflectionRefractionTests {
 
 		Render render = new Render() //
 				.setImageWriter(new ImageWriter("refractionTwoSpheres", 500, 500)) //
-				.setRayTracer(new BasicRayTracer(scene));
+				.setRayTracer(new BasicRayTracer(scene)) //
+				.setSupersamplingType(SUPERSAMPLING_TYPE.NONE);
 		render.renderImage();
 		render.writeToImage();
 	}

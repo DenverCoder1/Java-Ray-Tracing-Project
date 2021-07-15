@@ -51,6 +51,8 @@ public class Scene {
 
   /**
    * construct scene with defaults
+   * 
+   * @param sceneName
    */
   public Scene(String sceneName) {
     name = sceneName;
@@ -120,6 +122,8 @@ public class Scene {
   }
 
   /**
+   * set lights
+   * 
    * @param newLights the lights to set
    * @return scene object
    */
