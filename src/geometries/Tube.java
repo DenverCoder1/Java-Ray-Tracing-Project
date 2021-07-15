@@ -15,7 +15,7 @@ import static primitives.Util.isZero;
  * @author Jonah Lawrence
  * @author Elad Harizy
  */
-public class Tube implements Geometry {
+public class Tube extends Geometry {
   protected final Ray axis;
   protected final double radius;
 
@@ -64,8 +64,7 @@ public class Tube implements Geometry {
   }
 
   @Override
-  public List<Point3D> findIntersections(Ray ray) {
-    // TODO Auto-generated method stub
+  public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
     return null;
   }
 
