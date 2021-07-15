@@ -43,6 +43,33 @@ public class Point3D {
   }
 
   /**
+   * getter for X
+   * 
+   * @return x as a double
+   */
+  public double getX() {
+    return this.x.coord;
+  }
+
+  /**
+   * getter for Y
+   * 
+   * @return y as a double
+   */
+  public double getY() {
+    return this.y.coord;
+  }
+
+  /**
+   * getter for Z
+   * 
+   * @return z as a double
+   */
+  public double getZ() {
+    return this.z.coord;
+  }
+
+  /**
    * Subtract one point from another to form a vector
    * 
    * @param other the point to subtract
@@ -53,10 +80,10 @@ public class Point3D {
   }
 
   /**
-   * Add one point from another to form a vector
+   * Add a direction to the point and return the new point
    * 
    * @param direction the point to subtract
-   * @return vector from other point to the point the action is performed on
+   * @return the new point
    */
   public Point3D add(Vector direction) {
     return new Point3D(this.x.coord + direction.getHead().x.coord, this.y.coord + direction.getHead().y.coord,

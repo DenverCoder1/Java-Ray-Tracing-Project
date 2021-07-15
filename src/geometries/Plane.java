@@ -1,7 +1,12 @@
 package geometries;
 
+import java.util.List;
+
 import primitives.Point3D;
+import primitives.Ray;
 import primitives.Vector;
+
+import static primitives.Util.*;
 
 /**
  * Class Plane is the basic class representing a plane of Euclidean geometry in
@@ -10,7 +15,7 @@ import primitives.Vector;
  * @author Jonah Lawrence
  * @author Elad Harizy
  */
-public class Plane implements Geometry {
+public class Plane extends Geometry {
   protected final Point3D origin;
   protected final Vector normal;
 
@@ -57,12 +62,29 @@ public class Plane implements Geometry {
 
   @Override
   public Vector getNormal(Point3D point) {
-    return null;
+    return this.normal;
   }
 
   @Override
   public String toString() {
     return String.format("{ Origin: %s, Normal: %s }", this.origin.toString(), this.normal.toString());
+  }
+
+  @Override
+  public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+    try {
+      // direction from ray's origin to a point on the plane
+      Vector u = origin.subtract(ray.getOrigin());
+      // distance from ray's origin to the point
+      double t = normal.dotProduct(u) / normal.dotProduct(ray.getDirection());
+      // return the point if it is reached by the ray
+      if (t > 0 && !Double.isInfinite(t) && alignZero(maxDistance - t) >= 0) {
+        return List.of(new GeoPoint(this, ray.getPoint(t)));
+      }
+    } catch (IllegalArgumentException e) {
+      // ray has origin on the plane
+    }
+    return null;
   }
 
 }

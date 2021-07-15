@@ -10,7 +10,7 @@ import static primitives.Util.*;
  * 
  * @author Dan
  */
-public class Polygon implements Geometry {
+public class Polygon extends Geometry {
 	/**
 	 * List of polygon's vertices
 	 */
@@ -18,7 +18,7 @@ public class Polygon implements Geometry {
 	/**
 	 * Associated plane in which the polygon lays
 	 */
-	protected Triangle plane;
+	protected Plane plane;
 
 	/**
 	 * Polygon constructor based on vertices list. The list must be ordered by edge
@@ -48,7 +48,7 @@ public class Polygon implements Geometry {
 		// Generate the plane according to the first three vertices and associate the
 		// polygon with this plane.
 		// The plane holds the invariant normal (orthogonal unit) vector to the polygon
-		plane = new Triangle(vertices[0], vertices[1], vertices[2]);
+		plane = new Plane(vertices[0], vertices[1], vertices[2]);
 		if (vertices.length == 3)
 			return; // no need for more tests for a Triangle
 
@@ -84,5 +84,10 @@ public class Polygon implements Geometry {
 	@Override
 	public Vector getNormal(Point3D point) {
 		return plane.getNormal();
+	}
+
+	@Override
+	public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+		return null;
 	}
 }
