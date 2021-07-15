@@ -6,7 +6,6 @@ package unittests.lights;
 import org.junit.Test;
 
 import elements.*;
-import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
 import primitives.*;
@@ -21,7 +20,7 @@ import scene.Scene;
  * @author dzilb
  */
 public class ReflectionRefractionTests {
-	private Scene scene = new Scene("Test scene");
+	private Scene scene = new Scene("ReflectionRefractionTests");
 
 	/**
 	 * Produce a picture of a sphere lighted by a spot light
