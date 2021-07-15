@@ -58,7 +58,7 @@ public class GeometriesTests {
      * {@link geometries.Geometries#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testfindGeoIntersections() {
+    public void testFindGeoIntersections() {
         List<GeoPoint> expected;
         List<GeoPoint> actual;
         Plane plane = new Plane(new Point3D(0, 1, 0), new Point3D(2, 0, 0), new Point3D(0, 2, 0));

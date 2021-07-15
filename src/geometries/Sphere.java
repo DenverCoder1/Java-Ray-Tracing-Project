@@ -7,7 +7,7 @@ import primitives.Point3D;
 import primitives.Ray;
 import primitives.Vector;
 
-import static primitives.Util.isZero;
+import static primitives.Util.*;
 
 /**
  * Class Sphere is the basic class representing a sphere of Euclidean geometry
@@ -60,7 +60,7 @@ public class Sphere extends Geometry {
   }
 
   @Override
-  public List<GeoPoint> findGeoIntersections(Ray ray) {
+  public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
     // vector from ray origin to center
     Vector u;
     try {
@@ -86,13 +86,13 @@ public class Sphere extends Geometry {
     // create null list of intersection points
     List<GeoPoint> intersections = null;
     // if first point location lies in front of ray
-    if (tM - tH > 0) {
+    if (tM - tH > 0 && alignZero(maxDistance - (tM - tH)) >= 0) {
       // create list and add first point
       Point3D p1 = ray.getPoint(tM - tH);
       intersections = new ArrayList<>(List.of(new GeoPoint(this, p1)));
     }
     // if second point location lies in front of ray
-    if (tM + tH > 0) {
+    if (tM + tH > 0 && alignZero(maxDistance - (tM + tH)) >= 0) {
       // add second point to list
       Point3D p2 = ray.getPoint(tM + tH);
       // if no list is created return a list of second point

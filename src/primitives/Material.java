@@ -19,6 +19,16 @@ public class Material {
   public double kS;
 
   /**
+   * transparency
+   */
+  public double kT;
+
+  /**
+   * reflection
+   */
+  public double kR;
+
+  /**
    * shininess
    */
   public int nShininess;
@@ -28,11 +38,15 @@ public class Material {
    * 
    * @param kd
    * @param ks
+   * @param kr
+   * @param kt
    * @param shininess
    */
-  public Material(double kd, double ks, int shininess) {
+  public Material(double kd, double ks, double kr, double kt, int shininess) {
     this.kD = kd;
     this.kS = ks;
+    this.kR = kr;
+    this.kT = kt;
     this.nShininess = shininess;
   }
 
@@ -40,7 +54,7 @@ public class Material {
    * default constructor
    */
   public Material() {
-    this(0, 0, 0);
+    this(0, 0, 0, 0, 0);
   }
 
   /**
@@ -60,6 +74,26 @@ public class Material {
    */
   public Material setKS(double ks) {
     this.kS = ks;
+    return this;
+  }
+
+  /**
+   * set kr
+   * 
+   * @param kr
+   */
+  public Material setKR(double kr) {
+    this.kR = kr;
+    return this;
+  }
+
+  /**
+   * set kt
+   * 
+   * @param kt
+   */
+  public Material setKT(double kt) {
+    this.kT = kt;
     return this;
   }
 

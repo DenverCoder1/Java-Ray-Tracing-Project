@@ -33,8 +33,7 @@ public class Triangle extends Polygon {
   }
 
   @Override
-  public List<GeoPoint> findGeoIntersections(Ray ray) {
-    Plane plane = new Plane(vertices.get(0), vertices.get(1), vertices.get(2));
+  public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
     List<GeoPoint> intersections = plane.findGeoIntersections(ray);
     if (intersections == null) {
       return null;

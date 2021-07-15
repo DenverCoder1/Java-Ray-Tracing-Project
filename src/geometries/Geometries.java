@@ -55,7 +55,7 @@ public class Geometries implements Intersectable {
     }
 
     @Override
-    public List<GeoPoint> findGeoIntersections(Ray ray) {
+    public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
         // return null if no geometries
         if (geometryList == null) {
             return null;
@@ -64,7 +64,7 @@ public class Geometries implements Intersectable {
         List<GeoPoint> intersections = null;
         Iterator<Intersectable> iterator = geometryList.iterator();
         while (iterator.hasNext()) {
-            List<GeoPoint> newPoints = iterator.next().findGeoIntersections(ray);
+            List<GeoPoint> newPoints = iterator.next().findGeoIntersections(ray, maxDistance);
             // make sure there are points
             if (newPoints != null) {
                 // otherwise, initialize with a list when first intersection found
