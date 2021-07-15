@@ -1,6 +1,11 @@
 package scene;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import elements.AmbientLight;
+import elements.Camera;
+import elements.LightSource;
 import geometries.Geometries;
 import geometries.Intersectable;
 import primitives.Color;
@@ -35,18 +40,26 @@ public class Scene {
   public Geometries geometries;
 
   /**
-   * the distance of the camera from the view plane
+   * the camera
    */
-  private double distance;
+  private Camera camera;
+
+  /**
+   * list of lights
+   */
+  public List<LightSource> lights;
 
   /**
    * construct scene with defaults
+   * 
+   * @param sceneName
    */
   public Scene(String sceneName) {
     name = sceneName;
     background = Color.BLACK;
-    ambientLight = new AmbientLight(new Color(192, 192, 192), 1.d);
+    ambientLight = new AmbientLight(Color.BLACK, 0);
     geometries = new Geometries();
+    lights = new LinkedList<>();
   }
 
   /**
@@ -57,14 +70,22 @@ public class Scene {
   }
 
   /**
-   * @return the distance
+   * @return the camera
    */
-  public double getDistance() {
-    return distance;
+  public Camera getCamera() {
+    return camera;
+  }
+
+  /**
+   * @return the lights
+   */
+  public List<LightSource> getLights() {
+    return lights;
   }
 
   /**
    * @param newBackground the background to set
+   * @return scene object
    */
   public Scene setBackground(Color newBackground) {
     this.background = newBackground;
@@ -73,6 +94,7 @@ public class Scene {
 
   /**
    * @param newAmbientLight the ambientLight to set
+   * @return scene object
    */
   public Scene setAmbientLight(AmbientLight newAmbientLight) {
     this.ambientLight = newAmbientLight;
@@ -80,10 +102,11 @@ public class Scene {
   }
 
   /**
-   * @param newDistance the distance to set
+   * @param camera the camera to set
+   * @return scene object
    */
-  public Scene setDistance(double newDistance) {
-    this.distance = newDistance;
+  public Scene setCamera(Camera camera) {
+    this.camera = camera;
     return this;
   }
 
@@ -91,9 +114,21 @@ public class Scene {
    * add geometries to the scene
    * 
    * @param geometries to add to the scene
+   * @return scene object
    */
   public Scene addGeometries(Intersectable... newGeometries) {
     geometries.add(newGeometries);
+    return this;
+  }
+
+  /**
+   * set lights
+   * 
+   * @param newLights the lights to set
+   * @return scene object
+   */
+  public Scene setLights(List<LightSource> newLights) {
+    this.lights = newLights;
     return this;
   }
 }

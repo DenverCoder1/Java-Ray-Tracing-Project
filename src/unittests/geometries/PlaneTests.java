@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import geometries.*;
+import geometries.Intersectable.GeoPoint;
 import primitives.*;
 
 /**
@@ -47,24 +48,25 @@ public class PlaneTests {
     }
 
     /**
-     * Test method for {@link geometries.Plane#findIntersections(primitives.Ray)}.
+     * Test method for
+     * {@link geometries.Plane#findGeoIntersections(primitives.Ray)}.
      */
     @Test
-    public void testFindIntersections() {
-        List<Point3D> expected;
-        List<Point3D> actual;
+    public void testFindGeoIntersections() {
+        List<GeoPoint> expected;
+        List<GeoPoint> actual;
         Plane plane = new Plane(new Point3D(0, 1, 0), new Point3D(2, 0, 0), new Point3D(0, 2, 0));
         // ============ Equivalence Partitions Tests ==============
 
         // has intersection
         Ray ray1 = new Ray(new Point3D(0, 2, 1), new Vector(0, 0, -1));
-        expected = List.of(new Point3D(0, 2, 0));
-        actual = plane.findIntersections(ray1);
+        expected = List.of(new GeoPoint(plane, new Point3D(0, 2, 0)));
+        actual = plane.findGeoIntersections(ray1);
         assertEquals("has intersection failed", expected, actual);
 
         // no intersection
         Ray ray2 = new Ray(new Point3D(0, 2, 1), new Vector(0, 0, 1));
-        actual = plane.findIntersections(ray2);
+        actual = plane.findGeoIntersections(ray2);
         assertNull("no intersection should be null", actual);
 
         // =============== Boundary Values Tests ==================
@@ -73,42 +75,42 @@ public class PlaneTests {
 
         // ray has origin on the plane and is parallel to the plane
         Ray ray3 = new Ray(new Point3D(0, 1, 0), new Vector(0, -1, 0));
-        actual = plane.findIntersections(ray3);
+        actual = plane.findGeoIntersections(ray3);
         assertNull("inside plane should be null", actual);
 
         // ray is parallel and does not intersection
         Plane plane2 = new Plane(new Point3D(0, 0, 1), new Point3D(0, 1, 1), new Point3D(1, 0, 1));
         Ray ray4 = new Ray(new Point3D(0.25, 0.25, 2), new Vector(0, 1, 0));
-        actual = plane2.findIntersections(ray4);
+        actual = plane2.findGeoIntersections(ray4);
         assertNull("parallel ray should be null", actual);
 
         // **** group: orthogonal rays
 
         // ray has origin on the plane and is orthogonal to the plane
         Ray ray5 = new Ray(new Point3D(0, 1, 0), new Vector(0, 0, 1));
-        actual = plane.findIntersections(ray5);
+        actual = plane.findGeoIntersections(ray5);
         assertNull("orthogonal with only origin on plane should be null", actual);
 
         // ray starts before the plane and is orthogonal to the plane
         Ray ray6 = new Ray(new Point3D(0, 1, -1), new Vector(0, 0, 1));
-        expected = List.of(new Point3D(0, 1, 0));
-        actual = plane.findIntersections(ray6);
+        expected = List.of(new GeoPoint(plane, new Point3D(0, 1, 0)));
+        actual = plane.findGeoIntersections(ray6);
         assertEquals("orthogonal before failed", expected, actual);
 
         // ray starts after the plane and is orthogonal to the plane
         Ray ray7 = new Ray(new Point3D(0, 1, 2), new Vector(0, 0, 1));
-        actual = plane.findIntersections(ray7);
+        actual = plane.findGeoIntersections(ray7);
         assertNull("orthogonal after should not intersect", actual);
 
         // ray has origin on plane and is not orthogonal or parallel
         Ray ray8 = new Ray(new Point3D(0, 1, 0), new Vector(0, 1, 1));
-        actual = plane.findIntersections(ray8);
+        actual = plane.findGeoIntersections(ray8);
         assertNull("Origin on plane and not orthogonal failed", actual);
 
         // ray does not start on plane and is not orthogonal or parallel
         Ray ray9 = new Ray(new Point3D(0, 1, -1), new Vector(0, 1, 1));
-        expected = List.of(new Point3D(0, 2, 0));
-        actual = plane.findIntersections(ray9);
+        expected = List.of(new GeoPoint(plane, new Point3D(0, 2, 0)));
+        actual = plane.findGeoIntersections(ray9);
         assertEquals("not orthogonal or parallel failed", expected, actual);
     }
 }

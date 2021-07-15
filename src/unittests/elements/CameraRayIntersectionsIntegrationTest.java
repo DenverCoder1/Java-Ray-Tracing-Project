@@ -12,6 +12,7 @@ import geometries.Intersectable;
 import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
+import geometries.Intersectable.GeoPoint;
 import primitives.*;
 
 /**
@@ -33,7 +34,7 @@ public class CameraRayIntersectionsIntegrationTest {
     private void assertCountIntersections(Camera cam, Intersectable geo, int expected) {
         int count = 0;
 
-        List<Point3D> allpoints = null;
+        List<GeoPoint> allpoints = null;
 
         cam.setViewPlaneSize(3, 3);
         cam.setDistance(1);
@@ -42,7 +43,7 @@ public class CameraRayIntersectionsIntegrationTest {
         // view plane 3X3 (WxH 3X3 & nx,ny =3 => Rx,Ry =1)
         for (int i = 0; i < nY; ++i) {
             for (int j = 0; j < nX; ++j) {
-                var intersections = geo.findIntersections(cam.constructRayThroughPixel(nX, nY, j, i));
+                var intersections = geo.findGeoIntersections(cam.constructRayThroughPixel(nX, nY, j, i));
                 if (intersections != null) {
                     if (allpoints == null) {
                         allpoints = new LinkedList<>();
